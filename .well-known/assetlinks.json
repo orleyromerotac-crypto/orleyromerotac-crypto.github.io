@@ -1,8 +1,14 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "io.github.orleyromerotac_crypto.twa",
-        "sha256_cert_fingerprints": ["3D:8E:0D:FF:9C:34:00:6F:39:A5:D6:42:1B:7A:1A:19:46:A6:6D:96:6F:C4:96:EA:C2:F3:57:2C:68:08:76:44"]
-      }
-    }]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.orleyromerotac_crypto.twa",
+      "sha256_cert_fingerprints": [
+        "23:41:C9:E9:4B:71:FB:E0:F3:65:8A:83:3A:CB:0A:FF:ED:52:AB:82:61:42:00:D8:10:4E:F5:76:C3:C4:CC:B0"
+      ]
+    }
+  }
+]
