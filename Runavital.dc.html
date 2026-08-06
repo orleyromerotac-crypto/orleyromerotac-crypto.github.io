@@ -672,9 +672,14 @@
         <div style="border:1px solid var(--border); border-radius:14px; overflow:hidden;">
           <div style="padding:10px 16px; background:var(--bg); font-size:11px; font-weight:700; color:var(--text-soft);">Nombre</div>
           <sc-for list="{{repartidorOptions}}" as="r" hint-placeholder-count="3">
-            <div style="padding:12px 16px; border-top:1px solid var(--border); font-size:13px; font-weight:600; display:flex; align-items:center; justify-content:space-between; gap:10px;">
-              <span>{{r.name}}</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="cursor:pointer; flex:none;" onClick="{{r.deleteHandler}}"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-8 0v13a1 1 0 001 1h8a1 1 0 001-1V7" stroke="var(--text-soft)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div style="padding:12px 16px; border-top:1px solid var(--border); font-size:13px; font-weight:600; display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                <span>{{r.name}}</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="cursor:pointer; flex:none;" onClick="{{r.deleteHandler}}"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-8 0v13a1 1 0 001 1h8a1 1 0 001-1V7" stroke="var(--text-soft)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <sc-if value="{{r.hasCred}}" hint-placeholder-val="{{false}}">
+                <div style="font-size:12px; font-weight:600; color:var(--accent-dark); cursor:pointer; font-family:ui-monospace,monospace;" onClick="{{r.toggleCred}}">{{r.credLabel}}</div>
+              </sc-if>
             </div>
           </sc-for>
         </div>
@@ -805,6 +810,7 @@ class Component extends DCLogic {
       clientes: [],
       showClienteModal: false, newClienteNombre: '', newClienteDireccion: '', newClienteTelefono: '',
       showRepartidorModal: false, newRepartidorNombre: '', repartidorModalError: '', newRepartidorCreated: false, generatedUsername: '', generatedPassword: '',
+      repartidorCredentials: {}, shownCreds: {},
       showProductModal: false, newProductName: '', newProductUnit: '', newProductPrice: 0, newProductStock: 0,
       salesPeriod: 'dia', showReporte: false, adminViewingPedidos: false,
 
@@ -829,6 +835,7 @@ class Component extends DCLogic {
   }
 
   listenSharedData() {
+    if (this._unsubShared) { return; }
     this._sharedLoaded = false;
     this._unsubShared = this.db.collection('runavital').doc('shared').onSnapshot(snap => {
       const data = snap.exists ? snap.data() : {};
@@ -883,7 +890,7 @@ class Component extends DCLogic {
     const secAuth = secondary.auth();
     return secAuth.createUserWithEmailAndPassword(email, password).then(cred => {
       const uid = cred.user.uid;
-      return this.db.collection('users').doc(uid).set({ name: nombre, role: 'repartidor', email, createdAt: Date.now() })
+      return this.db.collection('users').doc(uid).set({ name: nombre, role: 'repartidor', email, password, createdAt: Date.now() })
         .then(() => this.db.collection('runavital').doc('shared').set({ repartidores: firebase.firestore.FieldValue.arrayUnion(nombre) }, { merge: true }))
         .then(() => secAuth.signOut());
     });
@@ -891,7 +898,6 @@ class Component extends DCLogic {
 
   logout() {
     if (this._unsubProfile) { this._unsubProfile(); this._unsubProfile = null; }
-    if (this._unsubShared) { this._unsubShared(); this._unsubShared = null; }
     this.auth.signOut();
     this.setState({ authEmail: '', authPassword: '', authName: '' });
   }
@@ -934,7 +940,6 @@ class Component extends DCLogic {
 
       this.auth.onAuthStateChanged(user => {
         if (this._unsubProfile) { this._unsubProfile(); this._unsubProfile = null; }
-        if (this._unsubShared) { this._unsubShared(); this._unsubShared = null; }
         if (!user) { this.setState({ authUser: null, profile: null, role: null, authLoading: false }); return; }
         this.setState({ authUser: { uid: user.uid, email: user.email }, authLoading: false });
         this._unsubProfile = this.db.collection('users').doc(user.uid).onSnapshot(snap => {
@@ -1031,7 +1036,7 @@ class Component extends DCLogic {
   setSalesPeriod(p) { this.setState({ salesPeriod: p }); }
   setAdminVentas() { this.setState({ adminScreen: 'ventas' }); }
   setAdminClientes() { this.setState({ adminScreen: 'clientes' }); }
-  setAdminEquipo() { this.setState({ adminScreen: 'equipo' }); }
+  setAdminEquipo() { this.setState({ adminScreen: 'equipo' }); this.loadRepartidorCredentials(); }
 
   setClienteModalOpen() { this.setState({ showClienteModal: true, newClienteNombre: '', newClienteDireccion: '', newClienteTelefono: '' }); }
   closeClienteModal() { this.setState({ showClienteModal: false }); }
@@ -1054,6 +1059,17 @@ class Component extends DCLogic {
         .then(snap => Promise.all(snap.docs.map(doc => doc.ref.delete())))
         .catch(err => console.error('Runavital: error revocando acceso del repartidor', err));
     }
+  }
+  loadRepartidorCredentials() {
+    if (!this.db) return;
+    this.db.collection('users').where('role', '==', 'repartidor').get().then(snap => {
+      const creds = {};
+      snap.docs.forEach(doc => { const d = doc.data(); creds[d.name] = { username: (d.email || '').split('@')[0], password: d.password || '(no disponible)' }; });
+      this.setState({ repartidorCredentials: creds });
+    }).catch(err => console.error('Runavital: error cargando credenciales', err));
+  }
+  toggleShowCred(name) {
+    this.setState(s => ({ shownCreds: { ...s.shownCreds, [name]: !s.shownCreds[name] } }));
   }
   submitNewRepartidor() {
     const s = this.state;
@@ -1349,7 +1365,16 @@ class Component extends DCLogic {
       logout: () => this.logout(),
       isRepartidor: s.role === 'repartidor' || (s.role === 'admin' && s.adminViewingPedidos), isAdmin: s.role === 'admin' && !s.adminViewingPedidos,
 
-      repartidorOptions: s.repartidores.map(name => ({ name, deleteHandler: () => this.deleteRepartidor(name) })),
+      repartidorOptions: s.repartidores.map(name => {
+        const cred = s.repartidorCredentials[name];
+        const shown = !!s.shownCreds[name];
+        return {
+          name, deleteHandler: () => this.deleteRepartidor(name),
+          hasCred: !!cred, credShown: shown,
+          credLabel: cred ? (shown ? ('Usuario: ' + cred.username + ' · Clave: ' + cred.password) : 'Ver acceso') : '',
+          toggleCred: () => this.toggleShowCred(name)
+        };
+      }),
       currentRepartidor: s.currentRepartidor, setCurrentRepartidor: (ev) => this.setCurrentRepartidor(ev.target.value),
 
       showEntregasLista: s.repartidorScreen === 'lista', showEntregaDetalle: s.repartidorScreen === 'detalle', showConfirmarEntrega: s.repartidorScreen === 'confirmar',
