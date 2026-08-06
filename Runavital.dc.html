@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#1f6e66">
+<link rel="apple-touch-icon" href="./assets/icon-192.png">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<template id="__bundler_thumbnail">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#1f6e66"/><path d="M100 40c20 30 40 55 40 80a40 40 0 1 1-80 0c0-25 20-50 40-80z" fill="#fff"/></svg>
+</template>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;-webkit-font-smoothing:antialiased;}
+  ::-webkit-scrollbar{width:0;height:0;}
+  a{color:inherit;}
+  a:hover{color:inherit;}
+  @media print{.no-print{display:none !important;}}
+</style>
+<script src="./doc-page.js"></script>
+</helmet>
+
+<div style="--accent:{{accent}};--accent-dark:oklch(0.46 0.10 190);--accent-light:oklch(0.95 0.035 185);--bg:oklch(0.96 0.025 190);--surface:#ffffff;--text:oklch(0.24 0.02 220);--text-soft:oklch(0.52 0.015 220);--border:oklch(0.9 0.02 190);--danger:oklch(0.58 0.19 25);--success:oklch(0.6 0.14 150);--warn:oklch(0.72 0.15 75); min-height:100vh; background:var(--bg); font-family:'Sora',system-ui,-apple-system,sans-serif; color:var(--text); display:flex; flex-direction:column; align-items:center; padding:130px 12px 32px; gap:20px; box-sizing:border-box; overflow-x:hidden;">
+
+  <sc-if value="{{showSplash}}" hint-placeholder-val="{{true}}">
+    <div style="position:fixed; inset:0; z-index:999; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 50% 30%, oklch(0.6 0.09 195), oklch(0.32 0.08 210)); overflow:hidden;">
+      <div style="position:absolute; inset:0; background:repeating-linear-gradient(120deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 2px, transparent 2px, transparent 40px);"></div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:16px; z-index:1;">
+        <img src="./assets/runavital-logo.jpeg" alt="Runavital" style="width:260px; height:auto; object-fit:contain; filter:drop-shadow(0 8px 20px rgba(0,0,0,.3));"/>
+        <div style="color:#fff; font-size:15px; font-weight:600; letter-spacing:.04em; opacity:.9;">Agua fresca, directo a tu puerta</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:100; display:flex; flex-direction:column; align-items:center; gap:10px;">
+    <img src="./assets/runavital-logo.jpeg" alt="Runavital" style="height:40px; width:auto; object-fit:contain;"/>
+    <div style="display:flex; align-items:center; gap:2px; background:#fff; border:1px solid var(--border); border-radius:999px; padding:4px; box-shadow:0 8px 24px rgba(20,30,50,.1);">
+      <div style="{{roleBtnRepartidorStyle}}" onClick="{{setRoleRepartidor}}">Repartidor</div>
+      <div style="{{roleBtnAdminStyle}}" onClick="{{setRoleAdmin}}">Admin</div>
+    </div>
+  </div>
+
+  <sc-if value="{{isRepartidor}}" hint-placeholder-val="{{true}}">
+  <div style="width:100%; max-width:390px; height:auto; max-height:calc(100vh - 170px); min-height:420px; background:var(--surface); border-radius:30px; box-shadow:0 24px 60px rgba(20,30,50,.16); overflow:hidden; display:flex; flex-direction:column; position:relative; border:1px solid var(--border);">
+    <div style="flex:1; overflow-y:auto;">
+
+      <sc-if value="{{showEntregasLista}}" hint-placeholder-val="{{true}}">
+        <div style="padding:20px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+            <div>
+              <div style="font-size:11px; font-weight:700; color:var(--text-soft); letter-spacing:.03em;">HOY</div>
+              <div style="font-size:19px; font-weight:800;">Tus entregas</div>
+            </div>
+            <div style="{{repartidorNuevoPedidoBtnStyle}}" onClick="{{setRepartidorNuevoPedido}}">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
+              Nuevo pedido
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:16px;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-soft);">VIENDO ENTREGAS DE</div>
+            <select value="{{currentRepartidor}}" onChange="{{setCurrentRepartidor}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box; background:#fff;">
+              <sc-for list="{{repartidorOptions}}" as="r" hint-placeholder-count="3">
+                <option value="{{r.name}}">{{r.name}}</option>
+              </sc-for>
+            </select>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <sc-for list="{{entregasFiltradas}}" as="e" hint-placeholder-count="4">
+              <div style="border:1px solid var(--border); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:6px; cursor:pointer;" onClick="{{e.selectHandler}}">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <div style="font-weight:700; font-size:14px;">{{e.cliente}}</div>
+                  <div style="{{e.badgeStyle}}">{{e.estadoLabel}}</div>
+                </div>
+                <div style="font-size:12px; color:var(--text-soft);">{{e.direccion}}</div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; margin-top:2px;">
+                  <span style="color:var(--text-soft);">{{e.items}}</span>
+                  <span style="font-weight:600;">{{e.fechaLabel}} {{e.horario}}</span>
+                </div>
+              </div>
+            </sc-for>
+            <sc-if value="{{entregasFiltradasVacio}}" hint-placeholder-val="{{false}}">
+              <div style="text-align:center; color:var(--text-soft); font-size:13px; padding:40px 0;">Sin entregas asignadas</div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{showEntregaDetalle}}" hint-placeholder-val="{{false}}">
+        <div style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="font-size:20px; cursor:pointer;" onClick="{{backToLista}}">‹</div>
+            <div style="font-size:17px; font-weight:800;">Detalle de entrega</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <div style="font-weight:800; font-size:15px;">{{selectedEntrega.cliente}}</div>
+            <div style="font-size:13px; color:var(--text-soft);">{{selectedEntrega.direccion}}</div>
+            <div style="font-size:13px; color:var(--text-soft);">Horario: {{selectedEntrega.horario}}</div>
+            <div style="font-size:13px; color:var(--text-soft);">Repartidor asignado: {{selectedEntrega.asignadoA}}</div>
+            <a href="{{selectedEntrega.mapsUrl}}" target="_blank" rel="noopener" style="font-size:13px; font-weight:700; color:var(--accent-dark);">Ver ubicación en Google Maps ↗</a>
+          </div>
+          <div style="padding:12px 16px; border-radius:999px; border:1px solid var(--border); text-align:center; font-weight:700; font-size:13px;">Llamar a {{selectedEntrega.clientePrimerNombre}}</div>
+          <div style="border:1px solid var(--border); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-soft); letter-spacing:.03em;">A ENTREGAR</div>
+            <div style="font-size:13px; font-weight:600;">{{selectedEntrega.items}}</div>
+            <sc-if value="{{selectedEntrega.retornable}}" hint-placeholder-val="{{false}}">
+              <div style="font-size:12px; color:var(--text-soft);">Recoger envase(s) vacío(s) al entregar</div>
+            </sc-if>
+          </div>
+          <sc-if value="{{selectedEntrega.hasConfirmacion}}" hint-placeholder-val="{{false}}">
+            <div style="border:1px solid var(--border); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:6px; background:oklch(0.97 0.02 150);">
+              <div style="font-size:11px; font-weight:700; color:var(--success); letter-spacing:.03em;">ENTREGA CONFIRMADA</div>
+              <div style="font-size:13px;">Cliente: {{selectedEntrega.confirmCliente}}</div>
+              <div style="font-size:13px;">Ubicación: {{selectedEntrega.confirmUbicacion}}</div>
+              <div style="font-size:13px;">Hora: {{selectedEntrega.confirmHora}}</div>
+              <div style="font-size:13px;">Detalle: {{selectedEntrega.confirmDetalle}}</div>
+              <sc-if value="{{selectedEntrega.confirmBidonPrestado}}" hint-placeholder-val="{{false}}">
+                <div style="font-size:13px; font-weight:600;">Bidón prestado al cliente</div>
+              </sc-if>
+              <sc-if value="{{selectedEntrega.confirmPagoPendiente}}" hint-placeholder-val="{{false}}">
+                <div style="font-size:13px; font-weight:700; color:var(--warn);">Pago pendiente</div>
+              </sc-if>
+              <sc-if value="{{selectedEntrega.confirmPagoTransferencia}}" hint-placeholder-val="{{false}}">
+                <div style="font-size:13px; font-weight:600;">Pago por transferencia bancaria</div>
+              </sc-if>
+              <sc-if value="{{selectedEntrega.hasComprobante}}" hint-placeholder-val="{{false}}">
+                <a href="{{selectedEntrega.confirmComprobante}}" target="_blank" rel="noopener" style="font-size:13px; font-weight:700; color:var(--accent-dark);">Ver comprobante: {{selectedEntrega.confirmComprobanteName}} ↗</a>
+              </sc-if>
+              <sc-if value="{{selectedEntrega.hasConfirmObservaciones}}" hint-placeholder-val="{{false}}">
+                <div style="font-size:13px;">Observaciones: {{selectedEntrega.confirmObservaciones}}</div>
+              </sc-if>
+            </div>
+          </sc-if>
+          <div style="{{entregaActionButtonStyle}}" onClick="{{entregaActionHandler}}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12h13M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            {{entregaActionLabel}}
+          </div>
+          <sc-if value="{{showNoEntregadoBtn}}" hint-placeholder-val="{{false}}">
+            <div style="padding:14px; border-radius:999px; border:1px solid var(--warn); color:var(--warn); text-align:center; font-weight:700; font-size:13px; cursor:pointer;" onClick="{{openNoEntregado}}">Pedido no entregado</div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{showConfirmarEntrega}}" hint-placeholder-val="{{false}}">
+        <div style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="font-size:20px; cursor:pointer;" onClick="{{cancelConfirmEntrega}}">‹</div>
+            <div style="font-size:17px; font-weight:800;">{{confirmScreenTitle}}</div>
+          </div>
+
+          <sc-if value="{{confirmModoEntregado}}" hint-placeholder-val="{{true}}">
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-soft);">NOMBRE DEL CLIENTE</div>
+            <input type="text" value="{{confirmCliente}}" onChange="{{setConfirmCliente}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box;"/>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-soft);">UBICACIÓN DE ENTREGA</div>
+            <input type="text" value="{{confirmUbicacion}}" onChange="{{setConfirmUbicacion}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box;"/>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-soft);">HORA DE ENTREGA</div>
+            <input type="text" value="{{confirmHora}}" onChange="{{setConfirmHora}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box;"/>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-soft);">DETALLE DEL PEDIDO</div>
+              <div style="font-size:13px; font-weight:600;">{{selectedEntrega.items}}</div>
+            </div>
+              <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onClick="{{toggleConfirmBidonPrestado}}">
+              <div style="{{confirmBidonPrestadoCheckboxStyle}}">{{confirmBidonPrestadoCheckMark}}</div>
+              <div style="font-size:13px; font-weight:600;">Se dejó prestado un bidón</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onClick="{{toggleConfirmPagoPendiente}}">
+              <div style="{{confirmPagoPendienteCheckboxStyle}}">{{confirmPagoPendienteCheckMark}}</div>
+              <div style="font-size:13px; font-weight:600;">Pedido pendiente de pago</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onClick="{{toggleConfirmPagoTransferencia}}">
+              <div style="{{confirmPagoTransferenciaCheckboxStyle}}">{{confirmPagoTransferenciaCheckMark}}</div>
+              <div style="font-size:13px; font-weight:600;">Pago realizado por transferencia bancaria</div>
+            </div>
+            <sc-if value="{{confirmPagoTransferencia}}" hint-placeholder-val="{{false}}">
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-soft);">COMPROBANTE DE PAGO (IMAGEN O PDF)</div>
+                <input type="file" accept="image/*,.pdf,application/pdf" onChange="{{setConfirmComprobante}}" style="font-size:12px;"/>
+                <sc-if value="{{hasConfirmComprobante}}" hint-placeholder-val="{{false}}">
+                  <div style="font-size:12px; color:var(--accent-dark); font-weight:600;">Adjuntado: {{confirmComprobanteName}}</div>
+                </sc-if>
+              </div>
+            </sc-if>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-soft);">OBSERVACIONES</div>
+              <textarea value="{{confirmObservaciones}}" onChange="{{setConfirmObservaciones}}" placeholder="Notas sobre la entrega (opcional)" rows="3" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box; resize:vertical;"></textarea>
+            </div>
+          </div>
+          </sc-if>
+
+          <sc-if value="{{confirmModoNoEntregado}}" hint-placeholder-val="{{false}}">
+            <div style="border:1px solid var(--border); border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:6px;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-soft);">DETALLE DEL PEDIDO</div>
+              <div style="font-size:13px; font-weight:600;">{{selectedEntrega.items}}</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-soft);">MOTIVO DE NO ENTREGA</div>
+              <textarea value="{{confirmObservaciones}}" onChange="{{setConfirmObservaciones}}" placeholder="Ej. cliente ausente, dirección incorrecta..." rows="3" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box; resize:vertical;"></textarea>
+            </div>
+          </sc-if>
+
+          <div style="{{confirmSubmitButtonStyle}}" onClick="{{submitConfirmEntrega}}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            {{confirmSubmitLabel}}
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{showRepartidorNuevoPedido}}" hint-placeholder-val="{{false}}">
+        <div style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="font-size:20px; cursor:pointer;" onClick="{{backToLista}}">‹</div>
+            <div style="font-size:17px; font-weight:800;">Nuevo pedido</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-soft);">CLIENTE</div>
+            <select value="{{newOrderClienteSelect}}" onChange="{{setNewOrderClienteSelect}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box; background:#fff;">
+              <option value="">— Elegir cliente guardado —</option>
+              <sc-for list="{{clienteOptions}}" as="c" hint-placeholder-count="3">
+                <option value="{{c.nombre}}">{{c.nombre}}</option>
+              </sc-for>
+              <option value="__nuevo__">+ Cliente nuevo</option>
+            </select>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-soft);">NOMBRE DEL CLIENTE</div>
+            <input type="text" value="{{newOrderCliente}}" onChange="{{setNewOrderCliente}}" placeholder="Nombre del cliente" disabled="{{newOrderClienteLocked}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box; {{newOrderClienteFieldStyle}}"/>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-soft);">DIRECCIÓN</div>
+            <input type="text" value="{{newOrderDireccion}}" onChange="{{setNewOrderDireccion}}" placeholder="Dirección de entrega" disabled="{{newOrderClienteLocked}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box; {{newOrderClienteFieldStyle}}"/>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-soft);">ENLACE DE GOOGLE MAPS (OPCIONAL)</div>
+            <input type="text" value="{{newOrderMapsLink}}" onChange="{{setNewOrderMapsLink}}" placeholder="Pegar link de Google Maps del cliente" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box;"/>
+          </div>
+          <div style="display:flex; gap:12px;">
+            <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-soft);">FECHA DE ENTREGA</div>
+              <input type="date" value="{{newOrderFecha}}" onChange="{{setNewOrderFecha}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box; width:100%;"/>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+              <div style="font-size:11px; font-weight:700; color:var(--text-soft);">HORA DE ENTREGA</div>
+              <input type="time" value="{{newOrderHora}}" onChange="{{setNewOrderHora}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box; width:100%;"/>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-soft);">ASIGNAR A REPARTIDOR</div>
+            <select value="{{newOrderRepartidor}}" onChange="{{setNewOrderRepartidor}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box; background:#fff;">
+              <sc-for list="{{repartidorOptions}}" as="r" hint-placeholder-count="3">
+                <option value="{{r.name}}">{{r.name}}</option>
+              </sc-for>
+            </select>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:11px; font-weight:700; color:var(--text-soft);">PRODUCTOS</div>
+            <sc-for list="{{newOrderItems}}" as="item" hint-placeholder-count="4">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); flex-wrap:wrap;">
+                <div style="font-size:13px; font-weight:600; flex:1; min-width:0;">{{item.name}}</div>
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <span style="color:var(--text-soft); font-size:12px;">$</span>
+                  <input type="number" step="0.01" min="0" value="{{item.price}}" onChange="{{item.priceChangeHandler}}" style="width:74px; padding:5px 6px; border:1px solid var(--border); border-radius:8px; font-family:'Sora',system-ui,sans-serif; font-size:12px;"/>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; background:var(--accent-light); border-radius:999px; padding:4px 6px;">
+                  <div style="width:22px; height:22px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; cursor:pointer; color:var(--accent-dark); flex:none;" onClick="{{item.decHandler}}">–</div>
+                  <input type="number" min="0" value="{{item.qty}}" onChange="{{item.qtyChangeHandler}}" style="width:44px; text-align:center; border:none; background:transparent; font-weight:700; font-size:13px; font-family:'Sora',system-ui,sans-serif;"/>
+                  <div style="width:22px; height:22px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; cursor:pointer; color:#fff; flex:none;" onClick="{{item.incHandler}}">+</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onClick="{{toggleNewOrderIva}}">
+            <div style="{{newOrderIvaCheckboxStyle}}">{{newOrderIvaCheckMark}}</div>
+            <div style="font-size:13px; font-weight:600;">Aplicar IVA (15%)</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px; font-size:13px; padding-top:6px; border-top:1px solid var(--border);">
+            <div style="display:flex; justify-content:space-between; color:var(--text-soft);"><span>Subtotal</span><span>{{newOrderSubtotalLabel}}</span></div>
+            <sc-if value="{{newOrderIvaApplied}}" hint-placeholder-val="{{true}}">
+              <div style="display:flex; justify-content:space-between; color:var(--text-soft);"><span>IVA (15%)</span><span>{{newOrderIvaLabel}}</span></div>
+            </sc-if>
+            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:16px;"><span>Total</span><span>{{newOrderTotalLabel}}</span></div>
+          </div>
+          <div style="{{newOrderSubmitStyle}}" onClick="{{submitNewOrder}}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Crear pedido
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{isAdmin}}" hint-placeholder-val="{{false}}">
+  <div style="width:100%; max-width:720px; height:auto; max-height:calc(100vh - 170px); min-height:420px; background:var(--surface); border-radius:20px; box-shadow:0 24px 60px rgba(20,30,50,.12); overflow:hidden; display:flex; flex-direction:column; border:1px solid var(--border); box-sizing:border-box;">
+    <div style="flex:none; background:var(--bg); border-bottom:1px solid var(--border); padding:16px; display:flex; flex-direction:column; gap:12px;">
+      <div style="font-size:15px; font-weight:800;">{{brandName}} <span style="font-weight:400; font-size:11px; color:var(--text-soft);">· Panel admin</span></div>
+      <div style="display:flex; gap:6px; overflow-x:auto;">
+        <div style="{{adminNavDashboardStyle}} flex:none; white-space:nowrap;" onClick="{{setAdminDashboard}}">Dashboard</div>
+        <div style="{{adminNavVentasStyle}} flex:none; white-space:nowrap;" onClick="{{setAdminVentas}}">Ventas</div>
+        <div style="{{adminNavInventarioStyle}} flex:none; white-space:nowrap;" onClick="{{setAdminInventario}}">Inventario</div>
+        <div style="{{adminNavClientesStyle}} flex:none; white-space:nowrap;" onClick="{{setAdminClientes}}">Clientes</div>
+        <div style="{{adminNavEquipoStyle}} flex:none; white-space:nowrap;" onClick="{{setAdminEquipo}}">Equipo</div>
+      </div>
+    </div>
+
+    <div style="flex:1; padding:20px 16px; overflow-y:auto; overflow-x:hidden; box-sizing:border-box; min-height:0;">
+      <sc-if value="{{showDashboard}}" hint-placeholder-val="{{true}}">
+        <div style="font-size:20px; font-weight:800; margin-bottom:20px;">Resumen de hoy</div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:16px; margin-bottom:28px;">
+          <div style="border:1px solid var(--border); border-radius:14px; padding:16px;">
+            <div style="font-size:11px; color:var(--text-soft); font-weight:700;">PEDIDOS HOY</div>
+            <div style="font-size:24px; font-weight:800; margin-top:6px;">{{kpiPedidosHoy}}</div>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:14px; padding:16px;">
+            <div style="font-size:11px; color:var(--text-soft); font-weight:700;">INGRESOS HOY</div>
+            <div style="font-size:24px; font-weight:800; margin-top:6px;">{{kpiIngresosHoy}}</div>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:14px; padding:16px;">
+            <div style="font-size:11px; color:var(--text-soft); font-weight:700;">STOCK BAJO</div>
+            <div style="font-size:24px; font-weight:800; margin-top:6px; color:var(--warn);">{{kpiStockBajo}}</div>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:14px; padding:16px;">
+            <div style="font-size:11px; color:var(--text-soft); font-weight:700;">REPARTIDORES</div>
+            <div style="font-size:24px; font-weight:800; margin-top:6px;">{{kpiRepartidores}}</div>
+          </div>
+        </div>
+
+        <div style="font-size:14px; font-weight:700; margin-bottom:10px;">Pedidos recientes</div>
+        <div style="border:1px solid var(--border); border-radius:14px; overflow-x:auto; max-width:100%;">
+          <div style="display:grid; grid-template-columns:100px 140px 200px 90px 110px 140px 90px; min-width:870px; padding:10px 16px; background:var(--bg); font-size:11px; font-weight:700; color:var(--text-soft);">
+            <div>Código</div><div>Cliente</div><div>Items</div><div>Total</div><div>Estado</div><div>Repartidor</div><div>Acción</div>
+          </div>
+          <sc-for list="{{pedidosRecientes}}" as="p" hint-placeholder-count="4">
+            <div style="display:grid; grid-template-columns:100px 140px 200px 90px 110px 140px 90px; min-width:870px; padding:12px 16px; border-top:1px solid var(--border); font-size:13px; align-items:center;">
+              <div style="color:var(--text-soft); font-family:ui-monospace,monospace; font-size:12px;">{{p.id}}</div>
+              <div style="font-weight:600;">{{p.cliente}}</div>
+              <div style="color:var(--text-soft);">{{p.items}}</div>
+              <div style="font-weight:700;">{{p.totalLabel}}</div>
+              <div><span style="{{p.badgeStyle}}">{{p.estado}}</span></div>
+              <div style="color:var(--text-soft);">{{p.repartidor}}</div>
+              <div>
+                <sc-if value="{{p.canCancel}}" hint-placeholder-val="{{true}}">
+                  <span style="color:var(--danger); font-weight:700; font-size:12px; cursor:pointer;" onClick="{{p.cancelHandler}}">Anular</span>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{showVentas}}" hint-placeholder-val="{{false}}">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+          <div style="font-size:20px; font-weight:800;">Ventas</div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <div style="{{salesTabDiaStyle}}" onClick="{{setSalesDia}}">Día</div>
+            <div style="{{salesTabSemanaStyle}}" onClick="{{setSalesSemana}}">Semana</div>
+            <div style="{{salesTabMesStyle}}" onClick="{{setSalesMesStyle}}">Mes</div>
+            <div style="{{salesTabAnioStyle}}" onClick="{{setSalesAnio}}">Año</div>
+          </div>
+        </div>
+
+        <div style="padding:10px 14px; border-radius:999px; background:var(--accent); color:#fff; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; margin-bottom:20px;" onClick="{{openReporte}}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Descargar reporte PDF ({{salesPeriodLabel}})
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:16px; margin-bottom:20px;">
+          <div style="border:1px solid var(--border); border-radius:14px; padding:16px;">
+            <div style="font-size:11px; color:var(--text-soft); font-weight:700;">{{salesPeriodLabel}} · PEDIDOS</div>
+            <div style="font-size:24px; font-weight:800; margin-top:6px;">{{salesPedidosCount}}</div>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:14px; padding:16px;">
+            <div style="font-size:11px; color:var(--text-soft); font-weight:700;">{{salesPeriodLabel}} · ITEMS VENDIDOS</div>
+            <div style="font-size:24px; font-weight:800; margin-top:6px;">{{salesItemsCount}}</div>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:14px; padding:16px;">
+            <div style="font-size:11px; color:var(--text-soft); font-weight:700;">{{salesPeriodLabel}} · INGRESOS</div>
+            <div style="font-size:24px; font-weight:800; margin-top:6px;">{{salesIngresosLabel}}</div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:16px; margin-bottom:28px;">
+          <div style="border:1px solid var(--border); border-radius:14px; padding:16px; background:oklch(0.97 0.02 150);">
+            <div style="font-size:11px; color:var(--success); font-weight:700;">TOTAL COBRADO HOY</div>
+            <div style="font-size:24px; font-weight:800; margin-top:6px;">{{totalCobradoHoyLabel}}</div>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:14px; padding:16px; background:oklch(0.97 0.03 75);">
+            <div style="font-size:11px; color:var(--warn); font-weight:700;">TOTAL PENDIENTE DE PAGO HOY</div>
+            <div style="font-size:24px; font-weight:800; margin-top:6px;">{{totalPendientePagoHoyLabel}}</div>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:14px; padding:16px; background:var(--accent-light);">
+            <div style="font-size:11px; color:var(--accent-dark); font-weight:700;">TOTAL POR TRANSFERENCIA HOY</div>
+            <div style="font-size:24px; font-weight:800; margin-top:6px;">{{totalTransferenciaHoyLabel}}</div>
+          </div>
+        </div>
+
+        <div style="font-size:14px; font-weight:700; margin-bottom:10px;">Items vendidos por producto ({{salesPeriodLabel}})</div>
+        <div style="border:1px solid var(--border); border-radius:14px; overflow-x:auto; max-width:100%;">
+          <div style="display:grid; grid-template-columns:2fr 1fr; min-width:260px; padding:10px 16px; background:var(--bg); font-size:11px; font-weight:700; color:var(--text-soft);">
+            <div>Producto</div><div>Unidades</div>
+          </div>
+          <sc-for list="{{salesByProduct}}" as="p" hint-placeholder-count="4">
+            <div style="display:grid; grid-template-columns:2fr 1fr; min-width:260px; padding:12px 16px; border-top:1px solid var(--border); font-size:13px; align-items:center;">
+              <div style="font-weight:600;">{{p.name}}</div>
+              <div>{{p.qty}}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{showInventario}}" hint-placeholder-val="{{false}}">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+          <div style="font-size:20px; font-weight:800;">Inventario y precios</div>
+          <div style="display:flex; gap:8px;">
+            <div style="padding:9px 16px; border-radius:999px; font-size:12px; font-weight:700; cursor:pointer; background:var(--accent); color:#fff;" onClick="{{setProductModalOpen}}">+ Agregar producto</div>
+            <div style="padding:9px 16px; border-radius:999px; font-size:12px; font-weight:700; cursor:pointer; background:var(--danger); color:#fff;" onClick="{{setBajaModalOpen}}">+ Registrar baja de bidón</div>
+          </div>
+        </div>
+
+        <sc-if value="{{showProductModal}}" hint-placeholder-val="{{false}}">
+          <div style="position:fixed; inset:0; z-index:200; background:rgba(20,30,50,.4); display:flex; align-items:center; justify-content:center;" onClick="{{closeProductModal}}">
+            <div style="background:#fff; border-radius:16px; padding:24px; width:min(360px, 90vw); max-height:85vh; overflow-y:auto; display:flex; flex-direction:column; gap:14px; box-sizing:border-box;" onClick="{{stopPropagation}}">
+              <div style="font-size:16px; font-weight:800;">Agregar producto</div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-soft);">NOMBRE</div>
+                <input type="text" value="{{newProductName}}" onChange="{{setNewProductName}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box;"/>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-soft);">UNIDAD (ej. c/u, paca x12)</div>
+                <input type="text" value="{{newProductUnit}}" onChange="{{setNewProductUnit}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box;"/>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-soft);">PRECIO DE REFERENCIA (USD)</div>
+                <input type="number" step="0.01" min="0" value="{{newProductPrice}}" onChange="{{setNewProductPrice}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box;"/>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-soft);">STOCK INICIAL</div>
+                <input type="number" value="{{newProductStock}}" onChange="{{setNewProductStock}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box;"/>
+              </div>
+              <div style="display:flex; gap:10px; margin-top:6px;">
+                <div style="flex:1; padding:12px; border-radius:999px; text-align:center; font-weight:700; font-size:13px; border:1px solid var(--border); cursor:pointer;" onClick="{{closeProductModal}}">Cancelar</div>
+                <div style="flex:1; padding:12px; border-radius:999px; text-align:center; font-weight:700; font-size:13px; background:var(--accent); color:#fff; cursor:pointer;" onClick="{{submitNewProduct}}">Agregar</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{showBajaModal}}" hint-placeholder-val="{{false}}">
+          <div style="position:fixed; inset:0; z-index:200; background:rgba(20,30,50,.4); display:flex; align-items:center; justify-content:center;" onClick="{{closeBajaModal}}">
+            <div style="background:#fff; border-radius:16px; padding:24px; width:min(360px, 90vw); max-height:85vh; overflow-y:auto; display:flex; flex-direction:column; gap:14px; box-sizing:border-box;" onClick="{{stopPropagation}}">
+              <div style="font-size:16px; font-weight:800;">Registrar baja de bidón</div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-soft);">MOTIVO</div>
+                <div style="display:flex; gap:8px;">
+                  <div style="{{bajaMotivoRotoStyle}}" onClick="{{setBajaMotivoRoto}}">Roto</div>
+                  <div style="{{bajaMotivoDeterioradoStyle}}" onClick="{{setBajaMotivoDeteriorado}}">Deteriorado</div>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-soft);">CANTIDAD</div>
+                <input type="number" value="{{bajaCantidad}}" onChange="{{setBajaCantidad}}" min="1" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box;"/>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-soft);">OBSERVACIONES (OPCIONAL)</div>
+                <textarea value="{{bajaObservaciones}}" onChange="{{setBajaObservaciones}}" rows="2" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box; resize:vertical;"></textarea>
+              </div>
+              <div style="display:flex; gap:10px; margin-top:6px;">
+                <div style="flex:1; padding:12px; border-radius:999px; text-align:center; font-weight:700; font-size:13px; border:1px solid var(--border); cursor:pointer;" onClick="{{closeBajaModal}}">Cancelar</div>
+                <div style="flex:1; padding:12px; border-radius:999px; text-align:center; font-weight:700; font-size:13px; background:var(--danger); color:#fff; cursor:pointer;" onClick="{{submitBaja}}">Registrar</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{hasBajas}}" hint-placeholder-val="{{false}}">
+          <div style="font-size:14px; font-weight:700; margin-bottom:10px;">Bidones dados de baja</div>
+          <div style="border:1px solid var(--border); border-radius:14px; overflow-x:auto; max-width:100%; margin-bottom:24px;">
+            <div style="display:grid; grid-template-columns:100px 120px 90px 1fr; min-width:520px; padding:10px 16px; background:var(--bg); font-size:11px; font-weight:700; color:var(--text-soft);">
+              <div>Fecha</div><div>Motivo</div><div>Cantidad</div><div>Observaciones</div>
+            </div>
+            <sc-for list="{{bajas}}" as="b" hint-placeholder-count="2">
+              <div style="display:grid; grid-template-columns:100px 120px 90px 1fr; min-width:520px; padding:12px 16px; border-top:1px solid var(--border); font-size:13px; align-items:center;">
+                <div style="color:var(--text-soft);">{{b.fecha}}</div>
+                <div style="font-weight:600;">{{b.motivo}}</div>
+                <div style="font-weight:700; color:var(--danger);">{{b.cantidad}}</div>
+                <div style="color:var(--text-soft);">{{b.observaciones}}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <div style="border:1px solid var(--border); border-radius:14px; overflow-x:auto; max-width:100%;">
+          <div style="display:grid; grid-template-columns:2fr 150px 90px; min-width:460px; padding:10px 16px; background:var(--bg); font-size:11px; font-weight:700; color:var(--text-soft);">
+            <div>Producto</div><div>Precio (USD)</div><div>Stock</div>
+          </div>
+          <sc-for list="{{inventoryProducts}}" as="p" hint-placeholder-count="4">
+            <div style="display:grid; grid-template-columns:2fr 150px 90px; min-width:460px; padding:12px 16px; border-top:1px solid var(--border); align-items:center; {{p.rowStyle}}">
+              <div>
+                <div style="font-weight:700; font-size:13px;">{{p.name}}</div>
+                <div style="font-size:11px; color:var(--text-soft);">{{p.unit}}</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:4px;">
+                <span style="color:var(--text-soft); font-size:13px;">$</span>
+                <input type="number" step="0.01" min="0" value="{{p.price}}" onChange="{{p.priceChange}}" style="width:90px; padding:6px 8px; border:1px solid var(--border); border-radius:8px; font-family:'Sora',system-ui,sans-serif; font-size:13px;"/>
+              </div>
+              <sc-if value="{{p.hasStock}}" hint-placeholder-val="{{true}}">
+                <input type="number" value="{{p.stock}}" onChange="{{p.stockChange}}" style="width:80px; padding:6px 8px; border:1px solid var(--border); border-radius:8px; font-family:'Sora',system-ui,sans-serif; font-size:13px;"/>
+              </sc-if>
+              <sc-if value="{{p.noStock}}" hint-placeholder-val="{{false}}">
+                <div style="font-size:12px; color:var(--text-soft);">—</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{showClientes}}" hint-placeholder-val="{{false}}">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+          <div style="font-size:20px; font-weight:800;">Clientes</div>
+          <div style="padding:9px 16px; border-radius:999px; font-size:12px; font-weight:700; cursor:pointer; background:var(--accent); color:#fff;" onClick="{{setClienteModalOpen}}">+ Agregar cliente</div>
+        </div>
+
+        <sc-if value="{{showClienteModal}}" hint-placeholder-val="{{false}}">
+          <div style="position:fixed; inset:0; z-index:200; background:rgba(20,30,50,.4); display:flex; align-items:center; justify-content:center;" onClick="{{closeClienteModal}}">
+            <div style="background:#fff; border-radius:16px; padding:24px; width:min(360px, 90vw); max-height:85vh; overflow-y:auto; display:flex; flex-direction:column; gap:14px; box-sizing:border-box;" onClick="{{stopPropagation}}">
+              <div style="font-size:16px; font-weight:800;">Agregar cliente</div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-soft);">NOMBRE</div>
+                <input type="text" value="{{newClienteNombre}}" onChange="{{setNewClienteNombre}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box;"/>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-soft);">DIRECCIÓN</div>
+                <input type="text" value="{{newClienteDireccion}}" onChange="{{setNewClienteDireccion}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box;"/>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-soft);">TELÉFONO (OPCIONAL)</div>
+                <input type="text" value="{{newClienteTelefono}}" onChange="{{setNewClienteTelefono}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box;"/>
+              </div>
+              <div style="display:flex; gap:10px; margin-top:6px;">
+                <div style="flex:1; padding:12px; border-radius:999px; text-align:center; font-weight:700; font-size:13px; border:1px solid var(--border); cursor:pointer;" onClick="{{closeClienteModal}}">Cancelar</div>
+                <div style="flex:1; padding:12px; border-radius:999px; text-align:center; font-weight:700; font-size:13px; background:var(--accent); color:#fff; cursor:pointer;" onClick="{{submitNewCliente}}">Agregar</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{hasClientes}}" hint-placeholder-val="{{false}}">
+          <div style="border:1px solid var(--border); border-radius:14px; overflow-x:auto; max-width:100%;">
+            <div style="display:grid; grid-template-columns:140px 200px 110px; min-width:450px; padding:10px 16px; background:var(--bg); font-size:11px; font-weight:700; color:var(--text-soft);">
+              <div>Nombre</div><div>Dirección</div><div>Teléfono</div>
+            </div>
+            <sc-for list="{{clientes}}" as="c" hint-placeholder-count="3">
+              <div style="display:grid; grid-template-columns:140px 200px 110px; min-width:450px; padding:12px 16px; border-top:1px solid var(--border); font-size:13px; align-items:center;">
+                <div style="font-weight:600;">{{c.nombre}}</div>
+                <div style="color:var(--text-soft);">{{c.direccion}}</div>
+                <div style="color:var(--text-soft);">{{c.telefono}}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{clientesVacio}}" hint-placeholder-val="{{true}}">
+          <div style="text-align:center; color:var(--text-soft); font-size:13px; padding:40px 0;">Todavía no agregaste clientes</div>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{showEquipo}}" hint-placeholder-val="{{false}}">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+          <div style="font-size:20px; font-weight:800;">Repartidores</div>
+          <div style="padding:9px 16px; border-radius:999px; font-size:12px; font-weight:700; cursor:pointer; background:var(--accent); color:#fff;" onClick="{{setRepartidorModalOpen}}">+ Agregar repartidor</div>
+        </div>
+
+        <sc-if value="{{showRepartidorModal}}" hint-placeholder-val="{{false}}">
+          <div style="position:fixed; inset:0; z-index:200; background:rgba(20,30,50,.4); display:flex; align-items:center; justify-content:center;" onClick="{{closeRepartidorModal}}">
+            <div style="background:#fff; border-radius:16px; padding:24px; width:min(360px, 90vw); max-height:85vh; overflow-y:auto; display:flex; flex-direction:column; gap:14px; box-sizing:border-box;" onClick="{{stopPropagation}}">
+              <div style="font-size:16px; font-weight:800;">Agregar repartidor</div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="font-size:11px; font-weight:700; color:var(--text-soft);">NOMBRE COMPLETO</div>
+                <input type="text" value="{{newRepartidorNombre}}" onChange="{{setNewRepartidorNombre}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box;"/>
+              </div>
+              <div style="display:flex; gap:10px; margin-top:6px;">
+                <div style="flex:1; padding:12px; border-radius:999px; text-align:center; font-weight:700; font-size:13px; border:1px solid var(--border); cursor:pointer;" onClick="{{closeRepartidorModal}}">Cancelar</div>
+                <div style="flex:1; padding:12px; border-radius:999px; text-align:center; font-weight:700; font-size:13px; background:var(--accent); color:#fff; cursor:pointer;" onClick="{{submitNewRepartidor}}">Agregar</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="border:1px solid var(--border); border-radius:14px; overflow:hidden;">
+          <div style="padding:10px 16px; background:var(--bg); font-size:11px; font-weight:700; color:var(--text-soft);">Nombre</div>
+          <sc-for list="{{repartidorOptions}}" as="r" hint-placeholder-count="3">
+            <div style="padding:12px 16px; border-top:1px solid var(--border); font-size:13px; font-weight:600;">{{r.name}}</div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{showReporte}}" hint-placeholder-val="{{false}}">
+    <div style="position:fixed; inset:0; z-index:500; background:var(--bg); overflow-y:auto;">
+      <div class="no-print" style="position:sticky; top:0; z-index:1; background:var(--surface); border-bottom:1px solid var(--border); padding:14px 20px; display:flex; align-items:center; justify-content:space-between;">
+        <div style="font-weight:700; font-size:14px;">Reporte de ventas · {{salesPeriodLabel}}</div>
+        <div style="display:flex; gap:10px;">
+          <div style="padding:8px 16px; border-radius:999px; background:var(--accent); color:#fff; font-size:12px; font-weight:700; cursor:pointer;" onClick="{{printReporte}}">Imprimir / Guardar PDF</div>
+          <div style="padding:8px 16px; border-radius:999px; border:1px solid var(--border); font-size:12px; font-weight:700; cursor:pointer;" onClick="{{closeReporte}}">Cerrar</div>
+        </div>
+      </div>
+
+      <style>doc-page:not(:defined){visibility:hidden}</style>
+      <doc-page margin="0.75in">
+        <div style="display:flex; align-items:baseline; justify-content:space-between; border-bottom:2px solid var(--accent); padding-bottom:12px; margin-bottom:20px;">
+          <div>
+            <div style="font-size:20px; font-weight:800;">{{brandName}}</div>
+            <div style="font-size:13px; color:var(--text-soft);">Reporte de ventas · {{salesPeriodLabel}}</div>
+          </div>
+          <div style="font-size:12px; color:var(--text-soft);">Generado: {{reporteFecha}}</div>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:14px; margin-bottom:26px;">
+          <div style="flex:1; min-width:140px; border:1px solid var(--border); border-radius:10px; padding:12px;">
+            <div style="font-size:10px; font-weight:700; color:var(--text-soft);">PEDIDOS</div>
+            <div style="font-size:18px; font-weight:800;">{{salesPedidosCount}}</div>
+          </div>
+          <div style="flex:1; min-width:140px; border:1px solid var(--border); border-radius:10px; padding:12px;">
+            <div style="font-size:10px; font-weight:700; color:var(--text-soft);">VENTA TOTAL</div>
+            <div style="font-size:18px; font-weight:800;">{{salesIngresosLabel}}</div>
+          </div>
+          <div style="flex:1; min-width:140px; border:1px solid var(--border); border-radius:10px; padding:12px;">
+            <div style="font-size:10px; font-weight:700; color:var(--text-soft);">COBRADO</div>
+            <div style="font-size:18px; font-weight:800;">{{reportTotalCobradoLabel}}</div>
+          </div>
+          <div style="flex:1; min-width:140px; border:1px solid var(--border); border-radius:10px; padding:12px;">
+            <div style="font-size:10px; font-weight:700; color:var(--text-soft);">PENDIENTE DE PAGO</div>
+            <div style="font-size:18px; font-weight:800;">{{reportTotalPendienteLabel}}</div>
+          </div>
+          <div style="flex:1; min-width:140px; border:1px solid var(--border); border-radius:10px; padding:12px;">
+            <div style="font-size:10px; font-weight:700; color:var(--text-soft);">POR TRANSFERENCIA</div>
+            <div style="font-size:18px; font-weight:800;">{{reportTotalTransferenciaLabel}}</div>
+          </div>
+        </div>
+
+        <h2 style="font-size:15px; margin:0 0 8px;">Pedidos cobrados</h2>
+        <table style="width:100%; border-collapse:collapse; margin-bottom:22px; font-size:12px;">
+          <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left; padding:6px 0;">Código</th><th style="text-align:left; padding:6px 0;">Cliente</th><th style="text-align:left; padding:6px 0;">Items</th><th style="text-align:center; padding:6px 0;">Bidón prestado</th><th style="text-align:right; padding:6px 0;">Total</th></tr></thead>
+          <tbody>
+            <sc-for list="{{reportCobrados}}" as="p" hint-placeholder-count="2">
+              <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 0;">{{p.id}}</td><td style="padding:6px 0;">{{p.cliente}}</td><td style="padding:6px 0;">{{p.items}}</td><td style="padding:6px 0; text-align:center;">{{p.bidonPrestadoLabel}}</td><td style="padding:6px 0; text-align:right;">{{p.totalLabel}}</td></tr>
+            </sc-for>
+          </tbody>
+        </table>
+        <sc-if value="{{reportCobradosVacio}}" hint-placeholder-val="{{false}}">
+          <p style="font-size:12px; color:var(--text-soft); margin-top:-14px;">Sin pedidos cobrados en este período.</p>
+        </sc-if>
+
+        <h2 style="font-size:15px; margin:0 0 8px;">Pedidos pendientes de pago</h2>
+        <table style="width:100%; border-collapse:collapse; margin-bottom:22px; font-size:12px;">
+          <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left; padding:6px 0;">Código</th><th style="text-align:left; padding:6px 0;">Cliente</th><th style="text-align:left; padding:6px 0;">Items</th><th style="text-align:center; padding:6px 0;">Bidón prestado</th><th style="text-align:right; padding:6px 0;">Total</th></tr></thead>
+          <tbody>
+            <sc-for list="{{reportPendientes}}" as="p" hint-placeholder-count="2">
+              <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 0;">{{p.id}}</td><td style="padding:6px 0;">{{p.cliente}}</td><td style="padding:6px 0;">{{p.items}}</td><td style="padding:6px 0; text-align:center;">{{p.bidonPrestadoLabel}}</td><td style="padding:6px 0; text-align:right;">{{p.totalLabel}}</td></tr>
+            </sc-for>
+          </tbody>
+        </table>
+        <sc-if value="{{reportPendientesVacio}}" hint-placeholder-val="{{false}}">
+          <p style="font-size:12px; color:var(--text-soft); margin-top:-14px;">Sin pedidos pendientes de pago en este período.</p>
+        </sc-if>
+
+        <h2 style="font-size:15px; margin:0 0 8px;">Pedidos pagados por transferencia</h2>
+        <table style="width:100%; border-collapse:collapse; margin-bottom:10px; font-size:12px;">
+          <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left; padding:6px 0;">Código</th><th style="text-align:left; padding:6px 0;">Cliente</th><th style="text-align:left; padding:6px 0;">Items</th><th style="text-align:center; padding:6px 0;">Bidón prestado</th><th style="text-align:right; padding:6px 0;">Total</th></tr></thead>
+          <tbody>
+            <sc-for list="{{reportTransferencia}}" as="p" hint-placeholder-count="2">
+              <tr style="border-bottom:1px solid var(--border);"><td style="padding:6px 0;">{{p.id}}</td><td style="padding:6px 0;">{{p.cliente}}</td><td style="padding:6px 0;">{{p.items}}</td><td style="padding:6px 0; text-align:center;">{{p.bidonPrestadoLabel}}</td><td style="padding:6px 0; text-align:right;">{{p.totalLabel}}</td></tr>
+            </sc-for>
+          </tbody>
+        </table>
+        <sc-if value="{{reportTransferenciaVacio}}" hint-placeholder-val="{{false}}">
+          <p style="font-size:12px; color:var(--text-soft); margin-top:-4px;">Sin pedidos por transferencia en este período.</p>
+        </sc-if>
+      </doc-page>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1400,&quot;height&quot;:900},&quot;brandName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Runavital&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Marca&quot;},&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#2f9e93&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Marca&quot;}}">
+class Component extends DCLogic {
+  state = this.loadPersisted() || this.defaultState();
+
+  STORAGE_KEY = 'runavital_data_v3';
+
+  defaultState() {
+    return {
+      showSplash: true,
+      role: 'repartidor',
+      repartidores: ['Jordy Reyes Piedra', 'David Quezada Coronel', 'Braulio Romero Castillo'],
+      currentRepartidor: 'Jordy Reyes Piedra',
+      repartidorScreen: 'lista',
+      selectedEntregaId: null,
+      confirmCliente: '', confirmUbicacion: '', confirmHora: '', confirmObservaciones: '', confirmBidonPrestado: false, confirmPagoPendiente: false, confirmPagoTransferencia: false,
+    confirmComprobante: '', confirmComprobanteName: '', confirmModo: 'entregado',
+      adminOrderCounter: 1053,
+      newOrderCliente: '', newOrderDireccion: '', newOrderClienteSelect: '', newOrderMapsLink: '', newOrderFecha: new Date().toISOString().slice(0, 10), newOrderHora: '', newOrderRepartidor: 'Jordy Reyes Piedra', newOrderCart: {}, newOrderPrices: {}, newOrderIvaApplied: true,
+      pedidosRecientes: [],
+      entregas: [],
+      adminScreen: 'dashboard',
+      showBajaModal: false, bajaMotivo: 'roto', bajaCantidad: 1, bajaObservaciones: '',
+      bajas: [],
+      clientes: [],
+      showClienteModal: false, newClienteNombre: '', newClienteDireccion: '', newClienteTelefono: '',
+      showRepartidorModal: false, newRepartidorNombre: '',
+      showProductModal: false, newProductName: '', newProductUnit: '', newProductPrice: 0, newProductStock: 0,
+      salesPeriod: 'dia', showReporte: false,
+
+      products: [
+        { id: 'bidon20', name: 'Bidón 20Lts', desc: 'Con envase incluido', price: 0, unit: 'c/u', category: 'bidones', stock: 0 },
+        { id: 'recarga20', name: 'Recarga Bidón 20Lts', desc: 'Canje de envase vacío', price: 0, unit: 'c/u', category: 'bidones', stock: 0 },
+        { id: 'paca600x20', name: 'Paca de Agua 600ml x20', desc: 'Paca de 20 unidades', price: 0, unit: 'paca x20', category: 'botellas600', stock: 0 },
+        { id: 'paca1lx12', name: 'Paca de Agua 1Lt x12', desc: 'Paca de 12 unidades', price: 0, unit: 'paca x12', category: 'botellas1l', stock: 0 }
+      ]
+    };
+  }
+
+  loadPersisted() {
+    try {
+      const raw = localStorage.getItem(this.STORAGE_KEY);
+      if (!raw) return null;
+      const saved = JSON.parse(raw);
+      const defaults = this.defaultState();
+      const validIds = new Set(defaults.products.map(p => p.id));
+      const savedHasValidProducts = Array.isArray(saved.products) && saved.products.some(p => validIds.has(p.id));
+      if (!savedHasValidProducts) return null;
+      return this.pruneOldData({ ...defaults, ...saved, showSplash: true });
+    } catch (e) { return null; }
+  }
+
+  pruneOldData(state) {
+    const TWO_YEARS_MS = 2 * 365 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    const keepRecent = (item) => !item.createdAt || (now - item.createdAt) <= TWO_YEARS_MS;
+    return {
+      ...state,
+      pedidosRecientes: (state.pedidosRecientes || []).filter(keepRecent),
+      entregas: (state.entregas || []).filter(keepRecent),
+      bajas: (state.bajas || []).filter(keepRecent)
+    };
+  }
+
+  persist() {
+    const s = this.state;
+    const toSave = {
+      products: s.products, entregas: s.entregas, pedidosRecientes: s.pedidosRecientes,
+      bajas: s.bajas, adminOrderCounter: s.adminOrderCounter, repartidores: s.repartidores,
+      currentRepartidor: s.currentRepartidor, clientes: s.clientes
+    };
+    try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(toSave)); } catch (e) {}
+  }
+
+  componentDidMount() {
+    setTimeout(() => this.setState({ showSplash: false }), 3000);
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+    window.addEventListener('afterprint', () => this.setState({ showReporte: false }));
+  }
+
+  openReporte() { this.setState({ showReporte: true }); }
+  closeReporte() { this.setState({ showReporte: false }); }
+  printReporte() { window.print(); }
+
+  componentDidUpdate() { this.persist(); }
+
+  fmt(n) {
+    const num = Number(n) || 0;
+    return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  genOrderCode() {
+    return 'RV-' + Date.now().toString(36).toUpperCase().slice(-5) + Math.random().toString(36).slice(2, 4).toUpperCase();
+  }
+
+  setRole(r) { this.setState({ role: r }); }
+  setCurrentRepartidor(v) { this.setState({ currentRepartidor: v }); }
+
+  selectEntrega(id) { this.setState({ selectedEntregaId: id, repartidorScreen: 'detalle' }); }
+  backToLista() { this.setState({ repartidorScreen: 'lista', selectedEntregaId: null }); }
+  advanceEntregaEstado(id) {
+    this.setState(s => ({
+      entregas: s.entregas.map(e => e.id === id && e.estado === 'pendiente' ? { ...e, estado: 'en_camino' } : e)
+    }));
+  }
+
+  nowLabel() {
+    const d = new Date();
+    return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  }
+
+  openConfirmEntrega(id) {
+    const e = this.state.entregas.find(x => x.id === id);
+    this.setState({ repartidorScreen: 'confirmar', confirmModo: 'entregado', confirmCliente: e.cliente, confirmUbicacion: e.direccion, confirmHora: this.nowLabel(), confirmObservaciones: '', confirmBidonPrestado: false, confirmPagoPendiente: false, confirmPagoTransferencia: false, confirmComprobante: '', confirmComprobanteName: '' });
+  }
+  openNoEntregado(id) {
+    this.setState({ selectedEntregaId: id, repartidorScreen: 'confirmar', confirmModo: 'no_entregado', confirmObservaciones: '' });
+  }
+  setConfirmComprobante(ev) {
+    const file = ev.target.files && ev.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => this.setState({ confirmComprobante: reader.result, confirmComprobanteName: file.name });
+    reader.readAsDataURL(file);
+  }
+  cancelConfirmEntrega() { this.setState({ repartidorScreen: 'detalle' }); }
+  toggleConfirmBidonPrestado() { this.setState(s => ({ confirmBidonPrestado: !s.confirmBidonPrestado })); }
+  toggleConfirmPagoPendiente() { this.setState(s => ({ confirmPagoPendiente: !s.confirmPagoPendiente })); }
+  toggleConfirmPagoTransferencia() { this.setState(s => ({ confirmPagoTransferencia: !s.confirmPagoTransferencia })); }
+  setRepartidorNuevoPedido() { this.setState({ repartidorScreen: 'nuevoPedido' }); }
+  setConfirmField(field, value) { this.setState({ [field]: value }); }
+  submitConfirmEntrega() {
+    const id = this.state.selectedEntregaId;
+    const s0 = this.state;
+    if (s0.confirmModo === 'no_entregado') {
+      const motivo = s0.confirmObservaciones;
+      this.setState(s => ({
+        entregas: s.entregas.map(e => e.id === id ? { ...e, estado: 'no_entregado', confirmObservaciones: motivo } : e),
+        repartidorScreen: 'lista', selectedEntregaId: null
+      }));
+      return;
+    }
+    const { confirmCliente, confirmUbicacion, confirmHora, confirmObservaciones, confirmBidonPrestado, confirmPagoPendiente, confirmPagoTransferencia, confirmComprobante, confirmComprobanteName } = s0;
+    this.setState(s => ({
+      entregas: s.entregas.map(e => e.id === id ? { ...e, estado: 'entregado', confirmCliente, confirmUbicacion, confirmHora, confirmObservaciones, confirmBidonPrestado, confirmPagoPendiente, confirmPagoTransferencia, confirmComprobante, confirmComprobanteName, confirmDetalle: e.items } : e),
+      repartidorScreen: 'lista', selectedEntregaId: null
+    }));
+  }
+
+  setAdminScreen(s) { this.setState({ adminScreen: s }); }
+  setSalesPeriod(p) { this.setState({ salesPeriod: p }); }
+  setAdminVentas() { this.setState({ adminScreen: 'ventas' }); }
+  setAdminClientes() { this.setState({ adminScreen: 'clientes' }); }
+  setAdminEquipo() { this.setState({ adminScreen: 'equipo' }); }
+
+  setClienteModalOpen() { this.setState({ showClienteModal: true, newClienteNombre: '', newClienteDireccion: '', newClienteTelefono: '' }); }
+  closeClienteModal() { this.setState({ showClienteModal: false }); }
+  setClienteField(field, value) { this.setState({ [field]: value }); }
+  submitNewCliente() {
+    const s = this.state;
+    if (!s.newClienteNombre || !s.newClienteDireccion) return;
+    const nuevo = { nombre: s.newClienteNombre, direccion: s.newClienteDireccion, telefono: s.newClienteTelefono || '—' };
+    this.setState(prev => ({ clientes: [nuevo, ...prev.clientes], showClienteModal: false }));
+  }
+
+  setRepartidorModalOpen() { this.setState({ showRepartidorModal: true, newRepartidorNombre: '' }); }
+  closeRepartidorModal() { this.setState({ showRepartidorModal: false }); }
+  setNewRepartidorNombre(value) { this.setState({ newRepartidorNombre: value }); }
+  submitNewRepartidor() {
+    const s = this.state;
+    if (!s.newRepartidorNombre || s.repartidores.includes(s.newRepartidorNombre)) return;
+    this.setState(prev => ({ repartidores: [...prev.repartidores, s.newRepartidorNombre], showRepartidorModal: false }));
+  }
+
+  setProductModalOpen() { this.setState({ showProductModal: true, newProductName: '', newProductUnit: '', newProductPrice: 0, newProductStock: 0 }); }
+  closeProductModal() { this.setState({ showProductModal: false }); }
+  setProductField(field, value) { this.setState({ [field]: value }); }
+  submitNewProduct() {
+    const s = this.state;
+    if (!s.newProductName) return;
+    const id = 'p' + Date.now();
+    const nuevo = { id, name: s.newProductName, desc: '', price: Number(s.newProductPrice) || 0, unit: s.newProductUnit || 'c/u', category: 'otros', stock: Number(s.newProductStock) || 0 };
+    this.setState(prev => ({ products: [...prev.products, nuevo], showProductModal: false }));
+  }
+  setBajaModalOpen() { this.setState({ showBajaModal: true, bajaMotivo: 'roto', bajaCantidad: 1, bajaObservaciones: '' }); }
+  closeBajaModal() { this.setState({ showBajaModal: false }); }
+  setBajaMotivo(m) { this.setState({ bajaMotivo: m }); }
+  setBajaField(field, value) { this.setState({ [field]: value }); }
+  submitBaja() {
+    const s = this.state;
+    const cantidad = Math.max(1, Number(s.bajaCantidad) || 1);
+    const fecha = new Date().toLocaleDateString('es-AR');
+    const nueva = { fecha, motivo: s.bajaMotivo === 'roto' ? 'Roto' : 'Deteriorado', cantidad, observaciones: s.bajaObservaciones || '—', createdAt: Date.now() };
+    this.setState(prev => ({
+      bajas: [nueva, ...prev.bajas],
+      products: prev.products.map(p => p.id === 'bidon20' ? { ...p, stock: Math.max(0, p.stock - cantidad) } : p),
+      showBajaModal: false
+    }));
+  }
+  setNewOrderField(field, value) { this.setState({ [field]: value }); }
+  setNewOrderClienteSelect(value) {
+    if (value === '__nuevo__' || value === '') {
+      this.setState({ newOrderClienteSelect: value, newOrderCliente: '', newOrderDireccion: '' });
+      return;
+    }
+    const c = this.state.clientes.find(cl => cl.nombre === value);
+    this.setState({ newOrderClienteSelect: value, newOrderCliente: c ? c.nombre : '', newOrderDireccion: c ? c.direccion : '' });
+  }
+  toggleNewOrderIva() { this.setState(s => ({ newOrderIvaApplied: !s.newOrderIvaApplied })); }
+  changeNewOrderQty(id, delta) {
+    this.setState(s => {
+      const cart = { ...s.newOrderCart };
+      const next = (cart[id] || 0) + delta;
+      if (next <= 0) { delete cart[id]; } else { cart[id] = next; }
+      return { newOrderCart: cart };
+    });
+  }
+  setNewOrderQty(id, value) {
+    const qty = Math.max(0, Math.floor(Number(value)) || 0);
+    this.setState(s => {
+      const cart = { ...s.newOrderCart };
+      if (qty <= 0) { delete cart[id]; } else { cart[id] = qty; }
+      return { newOrderCart: cart };
+    });
+  }
+  setNewOrderPrice(id, value) {
+    this.setState(s => ({ newOrderPrices: { ...s.newOrderPrices, [id]: Number(value) || 0 } }));
+  }
+  submitNewOrder() {
+    const s = this.state;
+    const entries = Object.keys(s.newOrderCart);
+    if (!s.newOrderCliente || !s.newOrderDireccion || entries.length === 0) return;
+    const items = entries.map(id => {
+      const p = s.products.find(pp => pp.id === id);
+      const price = s.newOrderPrices[id] ?? p.price;
+      return { p, qty: s.newOrderCart[id], price };
+    });
+    const subtotal = items.reduce((a, c) => a + c.price * c.qty, 0);
+    const total = s.newOrderIvaApplied ? Math.round(subtotal * 1.15 * 100) / 100 : subtotal;
+    const resumen = items.map(it => `${it.qty}x ${it.p.name}`).join(', ');
+    const itemsDetail = items.map(it => ({ id: it.p.id, name: it.p.name, qty: it.qty }));
+    const totalItems = items.reduce((a, c) => a + c.qty, 0);
+    const code = this.genOrderCode();
+    const nuevoPedido = { id: code, cliente: s.newOrderCliente, items: resumen, itemsDetail, totalItems, total, estado: 'Pendiente', repartidor: s.newOrderRepartidor, pagoPendiente: true, createdAt: Date.now(), fecha: s.newOrderFecha, horaEntrega: s.newOrderHora };
+    const nuevaEntrega = {
+      id: code, cliente: s.newOrderCliente, direccion: s.newOrderDireccion, mapsLink: s.newOrderMapsLink,
+      items: resumen, fecha: s.newOrderFecha, horario: s.newOrderHora || 'Sin definir', retornable: !!s.newOrderCart['recarga20'], estado: 'pendiente', asignadoA: s.newOrderRepartidor, createdAt: Date.now()
+    };
+    const clienteExiste = s.clientes.some(c => c.nombre.toLowerCase() === s.newOrderCliente.toLowerCase());
+    this.setState(prev => ({
+      pedidosRecientes: [nuevoPedido, ...prev.pedidosRecientes],
+      entregas: [nuevaEntrega, ...prev.entregas],
+      clientes: clienteExiste ? prev.clientes : [{ nombre: s.newOrderCliente, direccion: s.newOrderDireccion, telefono: '—' }, ...prev.clientes],
+      newOrderCliente: '', newOrderDireccion: '', newOrderClienteSelect: '', newOrderMapsLink: '', newOrderFecha: new Date().toISOString().slice(0, 10), newOrderHora: '', newOrderCart: {}, newOrderPrices: {}, newOrderIvaApplied: true,
+      repartidorScreen: 'lista'
+    }));
+  }
+
+  cancelPedido(id) {
+    this.setState(prev => ({
+      pedidosRecientes: prev.pedidosRecientes.map(p => p.id === id ? { ...p, estado: 'Anulado' } : p),
+      entregas: prev.entregas.map(e => e.id === id ? { ...e, estado: 'anulado' } : e)
+    }));
+  }
+  updateProductPrice(id, value) {
+    const price = Number(value) || 0;
+    this.setState(s => ({ products: s.products.map(p => p.id === id ? { ...p, price } : p) }));
+  }
+  updateProductStock(id, value) {
+    const stock = Number(value) || 0;
+    this.setState(s => ({ products: s.products.map(p => p.id === id ? { ...p, stock } : p) }));
+  }
+
+  renderVals() {
+    const s = this.state;
+    if (!s.newOrderCart) s.newOrderCart = {};
+    if (!s.newOrderPrices) s.newOrderPrices = {};
+    const accent = this.props.accentColor || '#2f9e93';
+    const brandName = this.props.brandName || 'Runavital';
+
+    const pillBase = 'padding:9px 16px; border-radius:999px; font-size:12px; font-weight:700; cursor:pointer; transition:background .15s;';
+    const pillOn = (bg, color) => pillBase + `background:${bg};color:${color};`;
+    const pillOff = pillBase + 'background:transparent;color:var(--text-soft);';
+    const pillOn2 = (active) => pillBase + (active ? 'background:var(--danger);color:#fff;flex:1;text-align:center;' : 'background:var(--bg);color:var(--text-soft);flex:1;text-align:center;');
+
+    const roleBtnRepartidorStyle = s.role === 'repartidor' ? pillOn('var(--accent)', '#fff') : pillOff;
+    const roleBtnAdminStyle = s.role === 'admin' ? pillOn('var(--accent)', '#fff') : pillOff;
+
+    const productCardData = (p, cartObj, changeFn) => {
+      const qty = cartObj[p.id] || 0;
+      return { ...p, priceLabel: this.fmt(p.price), qty, hasQty: qty > 0, showAdd: qty === 0, incHandler: () => changeFn(p.id, 1), decHandler: () => changeFn(p.id, -1) };
+    };
+
+    const badge = (bg, color) => `padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700; background:${bg}; color:${color};`;
+    const estadoMap = { pendiente: ['Pendiente', 'oklch(0.94 0.04 25)', 'var(--danger)'], en_camino: ['En camino', 'var(--accent-light)', 'var(--accent-dark)'], entregado: ['Entregado', 'oklch(0.93 0.05 150)', 'var(--success)'], anulado: ['Anulado', 'oklch(0.93 0.05 25)', 'var(--danger)'], no_entregado: ['No entregado', 'oklch(0.92 0.06 60)', 'oklch(0.4 0.12 55)'] };
+    const horarioEndMinutes = (horario) => {
+      const matches = [...(horario || '').matchAll(/(\d{1,2}):(\d{2})/g)];
+      if (matches.length === 0) return null;
+      const last = matches[matches.length - 1];
+      return parseInt(last[1], 10) * 60 + parseInt(last[2], 10);
+    };
+    const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes();
+    const fmtFechaLabel = (fecha) => {
+      if (!fecha) return '';
+      const [y, m, d] = fecha.split('-');
+      return d && m ? `${d}/${m}` : '';
+    };
+    const entregas = s.entregas.map(e => {
+      let [estadoLabel, bg, color] = estadoMap[e.estado];
+      if (e.estado === 'pendiente') {
+        const endMin = horarioEndMinutes(e.horario);
+        const todayIso = new Date().toISOString().slice(0, 10);
+        if (endMin !== null && (!e.fecha || e.fecha <= todayIso) && nowMinutes > endMin) { bg = 'oklch(0.9 0.09 95)'; color = 'oklch(0.45 0.13 80)'; }
+      }
+      return { ...e, estadoLabel, fechaLabel: fmtFechaLabel(e.fecha), badgeStyle: badge(bg, color), selectHandler: () => this.selectEntrega(e.id) };
+    });
+    const horarioMinutes = (horario) => {
+      const m = /(\d{1,2}):(\d{2})/.exec(horario || '');
+      return m ? parseInt(m[1], 10) * 60 + parseInt(m[2], 10) : 99999;
+    };
+    const entregasFiltradas = entregas
+      .filter(e => e.asignadoA === s.currentRepartidor && e.estado !== 'anulado')
+      .sort((a, b) => {
+        const fa = a.fecha || '9999-99-99', fb = b.fecha || '9999-99-99';
+        if (fa !== fb) return fa < fb ? -1 : 1;
+        return horarioMinutes(a.horario) - horarioMinutes(b.horario);
+      });
+
+    const selectedEntregaRaw = s.entregas.find(e => e.id === s.selectedEntregaId) || s.entregas[0] || { cliente: '', direccion: '', items: '', horario: '', estado: 'pendiente', asignadoA: '' };
+    const selectedEntrega = {
+      ...selectedEntregaRaw,
+      clientePrimerNombre: (selectedEntregaRaw.cliente || '').split(' ')[0],
+      hasConfirmacion: !!selectedEntregaRaw.confirmCliente,
+      hasConfirmObservaciones: !!selectedEntregaRaw.confirmObservaciones,
+      hasComprobante: !!selectedEntregaRaw.confirmComprobante,
+      mapsUrl: selectedEntregaRaw.mapsLink || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(selectedEntregaRaw.direccion || ''))
+    };
+    const entregaEsFinal = selectedEntregaRaw.estado === 'entregado' || selectedEntregaRaw.estado === 'no_entregado' || selectedEntregaRaw.estado === 'anulado';
+    const entregaActionLabel = selectedEntregaRaw.estado === 'pendiente' ? 'Iniciar entrega' : (selectedEntregaRaw.estado === 'en_camino' ? 'Marcar como entregado' : (selectedEntregaRaw.estado === 'no_entregado' ? 'Pedido no entregado' : 'Entrega completada'));
+    const entregaActionStyleBase = 'padding:15px; border-radius:999px; text-align:center; font-weight:700; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;';
+    const entregaActionButtonStyle = entregaEsFinal ? entregaActionStyleBase + 'background:var(--bg); color:var(--text-soft);' : entregaActionStyleBase + 'background:var(--accent); color:#fff;';
+    const entregaActionHandler = () => {
+      if (selectedEntregaRaw.estado === 'pendiente') this.advanceEntregaEstado(selectedEntregaRaw.id);
+      else if (selectedEntregaRaw.estado === 'en_camino') this.openConfirmEntrega(selectedEntregaRaw.id);
+    };
+    const showNoEntregadoBtn = selectedEntregaRaw.estado === 'pendiente' || selectedEntregaRaw.estado === 'en_camino';
+
+    const estadoBadge = { 'En camino': badge('var(--accent-light)', 'var(--accent-dark)'), 'Pendiente': badge('oklch(0.94 0.04 25)', 'var(--danger)'), 'Entregado': badge('oklch(0.93 0.05 150)', 'var(--success)'), 'Anulado': badge('oklch(0.93 0.05 25)', 'var(--danger)'), 'No entregado': badge('oklch(0.92 0.06 60)', 'oklch(0.4 0.12 55)') };
+    const entregaEstadoLabel = { pendiente: 'Pendiente', en_camino: 'En camino', entregado: 'Entregado', anulado: 'Anulado', no_entregado: 'No entregado' };
+    const pedidosRecientes = s.pedidosRecientes.map(p => {
+      const linked = s.entregas.find(e => e.id === p.id);
+      const estado = linked ? entregaEstadoLabel[linked.estado] : p.estado;
+      return {
+        ...p, estado, totalLabel: this.fmt(p.total), badgeStyle: estadoBadge[estado],
+        canCancel: estado !== 'Anulado' && estado !== 'Entregado' && estado !== 'No entregado',
+        cancelHandler: () => this.cancelPedido(p.id)
+      };
+    }).sort((a, b) => {
+      const fa = a.fecha || '9999-99-99', fb = b.fecha || '9999-99-99';
+      if (fa !== fb) return fa < fb ? -1 : 1;
+      return horarioMinutes(a.horaEntrega) - horarioMinutes(b.horaEntrega);
+    });
+
+    const newOrderItems = s.products.map(p => ({
+      ...productCardData(p, s.newOrderCart, (id, d) => this.changeNewOrderQty(id, d)),
+      price: s.newOrderPrices[p.id] ?? p.price,
+      priceChangeHandler: (ev) => this.setNewOrderPrice(p.id, ev.target.value),
+      qtyChangeHandler: (ev) => this.setNewOrderQty(p.id, ev.target.value)
+    }));
+    const newOrderTotal = Object.keys(s.newOrderCart).reduce((a, id) => {
+      const price = s.newOrderPrices[id] ?? s.products.find(pp => pp.id === id).price;
+      return a + price * s.newOrderCart[id];
+    }, 0);
+    const newOrderIva = s.newOrderIvaApplied ? Math.round(newOrderTotal * 0.15 * 100) / 100 : 0;
+    const newOrderGrandTotal = newOrderTotal + newOrderIva;
+    const newOrderValid = !!s.newOrderCliente && !!s.newOrderDireccion && Object.keys(s.newOrderCart).length > 0;
+    const newOrderSubmitStyle = 'padding:14px; border-radius:999px; text-align:center; font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px;' + (newOrderValid ? 'background:var(--accent); color:#fff; cursor:pointer;' : 'background:var(--bg); color:var(--text-soft); cursor:not-allowed;');
+
+    const inventoryProducts = s.products.map(p => ({
+      ...p,
+      hasStock: p.stock !== null,
+      noStock: p.stock === null,
+      rowStyle: (p.stock !== null && p.stock < 50) ? 'background:oklch(0.97 0.03 75);' : '',
+      priceChange: (ev) => this.updateProductPrice(p.id, ev.target.value),
+      stockChange: (ev) => this.updateProductStock(p.id, ev.target.value)
+    }));
+
+    const kpiPedidosHoy = s.pedidosRecientes.length;
+    const kpiIngresosHoy = this.fmt(s.pedidosRecientes.reduce((a, c) => a + c.total, 0));
+
+    const salesTab = (active) => 'padding:8px 16px; border-radius:999px; font-size:12px; font-weight:700; cursor:pointer;' + (active ? 'background:var(--accent);color:#fff;' : 'background:var(--bg);color:var(--text-soft);');
+    const periodLabels = { dia: 'HOY', semana: 'ESTA SEMANA', mes: 'ESTE MES', anio: 'ESTE AÑO' };
+    const now = Date.now();
+    const periodMs = { dia: 24 * 60 * 60 * 1000, semana: 7 * 24 * 60 * 60 * 1000, mes: 30 * 24 * 60 * 60 * 1000, anio: 365 * 24 * 60 * 60 * 1000 };
+    const ordersInPeriod = s.pedidosRecientes.filter(p => p.estado !== 'Anulado' && p.createdAt && (now - p.createdAt) <= periodMs[s.salesPeriod]);
+    const currentSales = {
+      pedidos: ordersInPeriod.length,
+      items: ordersInPeriod.reduce((a, c) => a + (c.totalItems || 0), 0),
+      total: ordersInPeriod.reduce((a, c) => a + c.total, 0)
+    };
+    const byProductMap = {};
+    ordersInPeriod.forEach(o => (o.itemsDetail || []).forEach(it => { byProductMap[it.id] = (byProductMap[it.id] || 0) + it.qty; }));
+    const salesByProduct = Object.keys(byProductMap).map(id => {
+      const p = s.products.find(pp => pp.id === id);
+      const qty = byProductMap[id];
+      return p ? { name: p.name, qty, subtotalLabel: this.fmt(qty * p.price) } : null;
+    }).filter(Boolean).sort((a, b) => b.qty - a.qty);
+    const matchEntrega = (p) => s.entregas.find(e => e.id === p.id);
+    const withLabel = (p) => {
+      const e = matchEntrega(p);
+      return {
+        ...p, totalLabel: this.fmt(p.total),
+        bidonPrestadoLabel: (e && e.confirmBidonPrestado) ? 'Sí' : 'No'
+      };
+    };
+    const allWithEntrega = s.pedidosRecientes.map(p => ({ p, e: matchEntrega(p) }));
+    const totalCobradoHoy = allWithEntrega.filter(({ e }) => e && e.estado === 'entregado' && !e.confirmPagoPendiente).reduce((a, { p }) => a + p.total, 0);
+    const totalPendientePagoHoy = allWithEntrega.filter(({ e }) => e && e.confirmPagoPendiente).reduce((a, { p }) => a + p.total, 0);
+    const totalTransferenciaHoy = allWithEntrega.filter(({ e }) => e && e.confirmPagoTransferencia).reduce((a, { p }) => a + p.total, 0);
+
+    const reportCobrados = ordersInPeriod.filter(p => { const e = matchEntrega(p); return e && e.estado === 'entregado' && !e.confirmPagoPendiente; }).map(withLabel);
+    const reportPendientes = ordersInPeriod.filter(p => { const e = matchEntrega(p); return e && e.confirmPagoPendiente; }).map(withLabel);
+    const reportTransferencia = ordersInPeriod.filter(p => { const e = matchEntrega(p); return e && e.confirmPagoTransferencia; }).map(withLabel);
+    const kpiStockBajo = s.products.filter(p => p.stock !== null && p.stock < 50).length;
+    const kpiRepartidores = s.repartidores.length;
+
+    const adminNavStyle = (active) => 'padding:10px 12px; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer;' + (active ? 'background:var(--accent-light);color:var(--accent-dark);' : 'color:var(--text-soft);');
+
+    return {
+      showSplash: s.showSplash,
+      accent, brandName,
+      isRepartidor: s.role === 'repartidor', isAdmin: s.role === 'admin',
+      setRoleRepartidor: () => this.setRole('repartidor'), setRoleAdmin: () => this.setRole('admin'),
+      roleBtnRepartidorStyle, roleBtnAdminStyle,
+
+      repartidorOptions: s.repartidores.map(name => ({ name })),
+      currentRepartidor: s.currentRepartidor, setCurrentRepartidor: (ev) => this.setCurrentRepartidor(ev.target.value),
+
+      showEntregasLista: s.repartidorScreen === 'lista', showEntregaDetalle: s.repartidorScreen === 'detalle', showConfirmarEntrega: s.repartidorScreen === 'confirmar',
+      showRepartidorNuevoPedido: s.repartidorScreen === 'nuevoPedido',
+      repartidorNuevoPedidoBtnStyle: 'padding:9px 16px; border-radius:999px; font-size:12px; font-weight:700; cursor:pointer; background:var(--accent); color:#fff; display:flex; align-items:center; gap:6px;',
+      setRepartidorNuevoPedido: () => this.setRepartidorNuevoPedido(),
+      entregasFiltradas, entregasFiltradasVacio: entregasFiltradas.length === 0,
+      selectedEntrega, backToLista: () => this.backToLista(),
+      entregaActionLabel, entregaActionButtonStyle, entregaActionHandler,
+      showNoEntregadoBtn, openNoEntregado: () => this.openNoEntregado(selectedEntregaRaw.id),
+      confirmModoEntregado: s.confirmModo !== 'no_entregado', confirmModoNoEntregado: s.confirmModo === 'no_entregado',
+      confirmScreenTitle: s.confirmModo === 'no_entregado' ? 'Pedido no entregado' : 'Confirmar entrega',
+      confirmSubmitLabel: s.confirmModo === 'no_entregado' ? 'Confirmar no entrega' : 'Marcar como entregado',
+      confirmSubmitButtonStyle: 'padding:15px; border-radius:999px; text-align:center; font-weight:700; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; color:#fff; background:' + (s.confirmModo === 'no_entregado' ? 'var(--warn)' : 'var(--accent)') + ';',
+      confirmCliente: s.confirmCliente, confirmUbicacion: s.confirmUbicacion, confirmHora: s.confirmHora,
+      setConfirmCliente: (ev) => this.setConfirmField('confirmCliente', ev.target.value),
+      setConfirmUbicacion: (ev) => this.setConfirmField('confirmUbicacion', ev.target.value),
+      setConfirmHora: (ev) => this.setConfirmField('confirmHora', ev.target.value),
+      cancelConfirmEntrega: () => this.cancelConfirmEntrega(),
+      submitConfirmEntrega: () => this.submitConfirmEntrega(),
+      confirmObservaciones: s.confirmObservaciones,
+      setConfirmObservaciones: (ev) => this.setConfirmField('confirmObservaciones', ev.target.value),
+      toggleConfirmBidonPrestado: () => this.toggleConfirmBidonPrestado(),
+      confirmBidonPrestadoCheckboxStyle: 'width:20px;height:20px;border-radius:6px;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex:none;background:' + (s.confirmBidonPrestado ? 'var(--accent)' : 'transparent') + ';',
+      confirmBidonPrestadoCheckMark: s.confirmBidonPrestado ? '✓' : '',
+      toggleConfirmPagoPendiente: () => this.toggleConfirmPagoPendiente(),
+      confirmPagoPendienteCheckboxStyle: 'width:20px;height:20px;border-radius:6px;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex:none;background:' + (s.confirmPagoPendiente ? 'var(--accent)' : 'transparent') + ';',
+      confirmPagoPendienteCheckMark: s.confirmPagoPendiente ? '✓' : '',
+      toggleConfirmPagoTransferencia: () => this.toggleConfirmPagoTransferencia(),
+      confirmPagoTransferenciaCheckboxStyle: 'width:20px;height:20px;border-radius:6px;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex:none;background:' + (s.confirmPagoTransferencia ? 'var(--accent)' : 'transparent') + ';',
+      confirmPagoTransferenciaCheckMark: s.confirmPagoTransferencia ? '✓' : '',
+      confirmPagoTransferencia: s.confirmPagoTransferencia,
+      setConfirmComprobante: (ev) => this.setConfirmComprobante(ev),
+      hasConfirmComprobante: !!s.confirmComprobante, confirmComprobanteName: s.confirmComprobanteName,
+
+      showDashboard: s.adminScreen === 'dashboard', showInventario: s.adminScreen === 'inventario', showVentas: s.adminScreen === 'ventas',
+      showClientes: s.adminScreen === 'clientes', showEquipo: s.adminScreen === 'equipo',
+      adminNavDashboardStyle: adminNavStyle(s.adminScreen === 'dashboard'), adminNavInventarioStyle: adminNavStyle(s.adminScreen === 'inventario'),
+      adminNavVentasStyle: adminNavStyle(s.adminScreen === 'ventas'), setAdminVentas: () => this.setAdminVentas(),
+      adminNavClientesStyle: adminNavStyle(s.adminScreen === 'clientes'), setAdminClientes: () => this.setAdminClientes(),
+      adminNavEquipoStyle: adminNavStyle(s.adminScreen === 'equipo'), setAdminEquipo: () => this.setAdminEquipo(),
+      setAdminDashboard: () => this.setAdminScreen('dashboard'), setAdminInventario: () => this.setAdminScreen('inventario'),
+      clientes: s.clientes, hasClientes: s.clientes.length > 0, clientesVacio: s.clientes.length === 0,
+      showClienteModal: s.showClienteModal, setClienteModalOpen: () => this.setClienteModalOpen(), closeClienteModal: () => this.closeClienteModal(),
+      newClienteNombre: s.newClienteNombre, setNewClienteNombre: (ev) => this.setClienteField('newClienteNombre', ev.target.value),
+      newClienteDireccion: s.newClienteDireccion, setNewClienteDireccion: (ev) => this.setClienteField('newClienteDireccion', ev.target.value),
+      newClienteTelefono: s.newClienteTelefono, setNewClienteTelefono: (ev) => this.setClienteField('newClienteTelefono', ev.target.value),
+      submitNewCliente: () => this.submitNewCliente(),
+      showRepartidorModal: s.showRepartidorModal, setRepartidorModalOpen: () => this.setRepartidorModalOpen(), closeRepartidorModal: () => this.closeRepartidorModal(),
+      newRepartidorNombre: s.newRepartidorNombre, setNewRepartidorNombre: (ev) => this.setNewRepartidorNombre(ev.target.value),
+      submitNewRepartidor: () => this.submitNewRepartidor(),
+      showProductModal: s.showProductModal, setProductModalOpen: () => this.setProductModalOpen(), closeProductModal: () => this.closeProductModal(),
+      newProductName: s.newProductName, setNewProductName: (ev) => this.setProductField('newProductName', ev.target.value),
+      newProductUnit: s.newProductUnit, setNewProductUnit: (ev) => this.setProductField('newProductUnit', ev.target.value),
+      newProductPrice: s.newProductPrice, setNewProductPrice: (ev) => this.setProductField('newProductPrice', ev.target.value),
+      newProductStock: s.newProductStock, setNewProductStock: (ev) => this.setProductField('newProductStock', ev.target.value),
+      submitNewProduct: () => this.submitNewProduct(),
+      totalCobradoHoyLabel: this.fmt(totalCobradoHoy), totalPendientePagoHoyLabel: this.fmt(totalPendientePagoHoy), totalTransferenciaHoyLabel: this.fmt(totalTransferenciaHoy),
+      showBajaModal: s.showBajaModal, setBajaModalOpen: () => this.setBajaModalOpen(), closeBajaModal: () => this.closeBajaModal(), stopPropagation: (ev) => ev.stopPropagation(),
+      bajaMotivoRotoStyle: pillOn2(s.bajaMotivo === 'roto'), bajaMotivoDeterioradoStyle: pillOn2(s.bajaMotivo === 'deteriorado'),
+      setBajaMotivoRoto: () => this.setBajaMotivo('roto'), setBajaMotivoDeteriorado: () => this.setBajaMotivo('deteriorado'),
+      bajaCantidad: s.bajaCantidad, setBajaCantidad: (ev) => this.setBajaField('bajaCantidad', ev.target.value),
+      bajaObservaciones: s.bajaObservaciones, setBajaObservaciones: (ev) => this.setBajaField('bajaObservaciones', ev.target.value),
+      submitBaja: () => this.submitBaja(),
+      hasBajas: s.bajas.length > 0, bajas: s.bajas,
+      kpiPedidosHoy, kpiIngresosHoy, kpiStockBajo, kpiRepartidores, pedidosRecientes, inventoryProducts,
+      salesTabDiaStyle: salesTab(s.salesPeriod === 'dia'), salesTabSemanaStyle: salesTab(s.salesPeriod === 'semana'), salesTabMesStyle: salesTab(s.salesPeriod === 'mes'),
+      setSalesDia: () => this.setSalesPeriod('dia'), setSalesSemana: () => this.setSalesPeriod('semana'), setSalesMesStyle: () => this.setSalesPeriod('mes'),
+      salesTabAnioStyle: salesTab(s.salesPeriod === 'anio'), setSalesAnio: () => this.setSalesPeriod('anio'),
+      salesPeriodLabel: periodLabels[s.salesPeriod], salesPedidosCount: currentSales.pedidos, salesItemsCount: currentSales.items, salesIngresosLabel: this.fmt(currentSales.total),
+      salesByProduct,
+      showReporte: s.showReporte, openReporte: () => this.openReporte(), closeReporte: () => this.closeReporte(), printReporte: () => this.printReporte(),
+      reporteFecha: new Date().toLocaleDateString('es-AR'),
+      reportTotalCobradoLabel: this.fmt(reportCobrados.reduce((a, c) => a + c.total, 0)),
+      reportTotalPendienteLabel: this.fmt(reportPendientes.reduce((a, c) => a + c.total, 0)),
+      reportTotalTransferenciaLabel: this.fmt(reportTransferencia.reduce((a, c) => a + c.total, 0)),
+      reportCobrados, reportCobradosVacio: reportCobrados.length === 0,
+      reportPendientes, reportPendientesVacio: reportPendientes.length === 0,
+      reportTransferencia, reportTransferenciaVacio: reportTransferencia.length === 0,
+      newOrderCliente: s.newOrderCliente, newOrderDireccion: s.newOrderDireccion,
+      setNewOrderCliente: (ev) => this.setNewOrderField('newOrderCliente', ev.target.value),
+      setNewOrderDireccion: (ev) => this.setNewOrderField('newOrderDireccion', ev.target.value),
+      clienteOptions: s.clientes, newOrderClienteSelect: s.newOrderClienteSelect,
+      setNewOrderClienteSelect: (ev) => this.setNewOrderClienteSelect(ev.target.value),
+      newOrderClienteLocked: s.newOrderClienteSelect !== '' && s.newOrderClienteSelect !== '__nuevo__',
+      newOrderClienteFieldStyle: (s.newOrderClienteSelect !== '' && s.newOrderClienteSelect !== '__nuevo__') ? 'background:var(--bg); color:var(--text-soft);' : '',
+      newOrderMapsLink: s.newOrderMapsLink,
+      setNewOrderMapsLink: (ev) => this.setNewOrderField('newOrderMapsLink', ev.target.value),
+      newOrderHora: s.newOrderHora, setNewOrderHora: (ev) => this.setNewOrderField('newOrderHora', ev.target.value),
+      newOrderFecha: s.newOrderFecha, setNewOrderFecha: (ev) => this.setNewOrderField('newOrderFecha', ev.target.value),
+      newOrderRepartidor: s.newOrderRepartidor, setNewOrderRepartidor: (ev) => this.setNewOrderField('newOrderRepartidor', ev.target.value),
+      newOrderItems, newOrderSubtotalLabel: this.fmt(newOrderTotal), newOrderIvaLabel: this.fmt(newOrderIva), newOrderTotalLabel: this.fmt(newOrderGrandTotal), newOrderSubmitStyle,
+      newOrderIvaApplied: s.newOrderIvaApplied, toggleNewOrderIva: () => this.toggleNewOrderIva(),
+      newOrderIvaCheckboxStyle: 'width:20px;height:20px;border-radius:6px;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex:none;background:' + (s.newOrderIvaApplied ? 'var(--accent)' : 'transparent') + ';',
+      newOrderIvaCheckMark: s.newOrderIvaApplied ? '✓' : '',
+      submitNewOrder: () => this.submitNewOrder()
+    };
+  }
+}
+</script>
+</body>
+</html>
