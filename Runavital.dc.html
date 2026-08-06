@@ -306,6 +306,7 @@
               <input type="time" value="{{newOrderHora}}" onChange="{{setNewOrderHora}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box; width:100%;"/>
             </div>
           </div>
+          <sc-if value="{{showAsignarRepartidor}}" hint-placeholder-val="{{false}}">
           <div style="display:flex; flex-direction:column; gap:6px;">
             <div style="font-size:11px; font-weight:700; color:var(--text-soft);">ASIGNAR A REPARTIDOR</div>
             <select value="{{newOrderRepartidor}}" onChange="{{setNewOrderRepartidor}}" style="padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box; background:#fff;">
@@ -314,6 +315,7 @@
               </sc-for>
             </select>
           </div>
+          </sc-if>
           <div style="display:flex; flex-direction:column; gap:6px;">
             <div style="font-size:11px; font-weight:700; color:var(--text-soft);">PRODUCTOS</div>
             <sc-for list="{{newOrderItems}}" as="item" hint-placeholder-count="4">
@@ -419,7 +421,7 @@
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <div style="{{salesTabDiaStyle}}" onClick="{{setSalesDia}}">Día</div>
             <div style="{{salesTabSemanaStyle}}" onClick="{{setSalesSemana}}">Semana</div>
-            <div style="{{salesTabMesStyle}}" onClick="{{setSalesMesStyle}}">Mes</div>
+            <div style="{{salesTabMesStyle}}" onClick="{{setSalesMes}}">Mes</div>
             <div style="{{salesTabAnioStyle}}" onClick="{{setSalesAnio}}">Año</div>
           </div>
         </div>
@@ -816,7 +818,7 @@ class Component extends DCLogic {
   }
 
   persist() {
-    if (this._suppressPersist || !this.db || !this.state.authUser) return;
+    if (this._suppressPersist || !this._sharedLoaded || !this.db || !this.state.authUser) return;
     const s = this.state;
     const toSave = {
       products: s.products, entregas: s.entregas, pedidosRecientes: s.pedidosRecientes,
@@ -827,6 +829,7 @@ class Component extends DCLogic {
   }
 
   listenSharedData() {
+    this._sharedLoaded = false;
     this._unsubShared = this.db.collection('runavital').doc('shared').onSnapshot(snap => {
       const data = snap.exists ? snap.data() : {};
       this._suppressPersist = true;
@@ -838,7 +841,7 @@ class Component extends DCLogic {
         repartidores: (data.repartidores && data.repartidores.length) ? data.repartidores : this.state.repartidores,
         clientes: data.clientes || [],
         adminOrderCounter: data.adminOrderCounter ?? this.state.adminOrderCounter
-      }, () => { this._suppressPersist = false; });
+      }, () => { this._suppressPersist = false; this._sharedLoaded = true; });
     }, err => console.error('Runavital: error de sincronización', err));
   }
 
@@ -1000,7 +1003,11 @@ class Component extends DCLogic {
   toggleConfirmBidonPrestado() { this.setState(s => ({ confirmBidonPrestado: !s.confirmBidonPrestado })); }
   toggleConfirmPagoPendiente() { this.setState(s => ({ confirmPagoPendiente: !s.confirmPagoPendiente })); }
   toggleConfirmPagoTransferencia() { this.setState(s => ({ confirmPagoTransferencia: !s.confirmPagoTransferencia })); }
-  setRepartidorNuevoPedido() { this.setState({ repartidorScreen: 'nuevoPedido' }); }
+  setRepartidorNuevoPedido() {
+    const s = this.state;
+    const asignado = s.role === 'admin' ? s.newOrderRepartidor : s.currentRepartidor;
+    this.setState({ repartidorScreen: 'nuevoPedido', newOrderRepartidor: asignado });
+  }
   setConfirmField(field, value) { this.setState({ [field]: value }); }
   submitConfirmEntrega() {
     const id = this.state.selectedEntregaId;
@@ -1417,7 +1424,7 @@ class Component extends DCLogic {
       hasBajas: s.bajas.length > 0, bajas: s.bajas,
       kpiPedidosHoy, kpiIngresosHoy, kpiStockBajo, kpiRepartidores, pedidosRecientes, inventoryProducts,
       salesTabDiaStyle: salesTab(s.salesPeriod === 'dia'), salesTabSemanaStyle: salesTab(s.salesPeriod === 'semana'), salesTabMesStyle: salesTab(s.salesPeriod === 'mes'),
-      setSalesDia: () => this.setSalesPeriod('dia'), setSalesSemana: () => this.setSalesPeriod('semana'), setSalesMesStyle: () => this.setSalesPeriod('mes'),
+      setSalesDia: () => this.setSalesPeriod('dia'), setSalesSemana: () => this.setSalesPeriod('semana'), setSalesMes: () => this.setSalesPeriod('mes'),
       salesTabAnioStyle: salesTab(s.salesPeriod === 'anio'), setSalesAnio: () => this.setSalesPeriod('anio'),
       salesPeriodLabel: periodLabels[s.salesPeriod], salesPedidosCount: currentSales.pedidos, salesItemsCount: currentSales.items, salesIngresosLabel: this.fmt(currentSales.total),
       salesByProduct,
@@ -1441,6 +1448,7 @@ class Component extends DCLogic {
       newOrderHora: s.newOrderHora, setNewOrderHora: (ev) => this.setNewOrderField('newOrderHora', ev.target.value),
       newOrderFecha: s.newOrderFecha, setNewOrderFecha: (ev) => this.setNewOrderField('newOrderFecha', ev.target.value),
       newOrderRepartidor: s.newOrderRepartidor, setNewOrderRepartidor: (ev) => this.setNewOrderField('newOrderRepartidor', ev.target.value),
+      showAsignarRepartidor: s.role === 'admin',
       newOrderItems, newOrderSubtotalLabel: this.fmt(newOrderTotal), newOrderIvaLabel: this.fmt(newOrderIva), newOrderTotalLabel: this.fmt(newOrderGrandTotal), newOrderSubmitStyle,
       newOrderIvaApplied: s.newOrderIvaApplied, toggleNewOrderIva: () => this.toggleNewOrderIva(),
       newOrderIvaCheckboxStyle: 'width:20px;height:20px;border-radius:6px;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex:none;background:' + (s.newOrderIvaApplied ? 'var(--accent)' : 'transparent') + ';',
