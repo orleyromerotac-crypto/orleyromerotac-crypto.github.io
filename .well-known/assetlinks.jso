@@ -1,8 +1,0 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "io.github.orleyromerotac_crypto.twa",
-        "sha256_cert_fingerprints": ["43:23:74:D2:6F:62:C6:C9:F3:41:1D:91:93:CC:3B:C7:A7:0A:76:F6:53:C9:F3:44:11:F6:D6:4B:FC:C9:2D:37"]
-      }
-    }]
