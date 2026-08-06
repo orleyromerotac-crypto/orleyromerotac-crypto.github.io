@@ -72,8 +72,9 @@
           </div>
           <div style="display:flex; flex-direction:column; gap:12px;">
             <sc-for list="{{entregasFiltradas}}" as="e" hint-placeholder-count="4">
-              <div style="border:1px solid var(--border); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:6px; cursor:pointer;" onClick="{{e.selectHandler}}">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="border:1px solid var(--border); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:6px; cursor:pointer; position:relative;" onClick="{{e.selectHandler}}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="position:absolute; top:12px; right:12px; cursor:pointer; z-index:1;" onClick="{{e.deleteHandler}}"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-8 0v13a1 1 0 001 1h8a1 1 0 001-1V7" stroke="var(--text-soft)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div style="display:flex; justify-content:space-between; align-items:center; padding-right:22px;">
                   <div style="font-weight:700; font-size:14px;">{{e.cliente}}</div>
                   <div style="{{e.badgeStyle}}">{{e.estadoLabel}}</div>
                 </div>
@@ -337,22 +338,24 @@
         </div>
 
         <div style="font-size:14px; font-weight:700; margin-bottom:10px;">Pedidos recientes</div>
-        <div style="border:1px solid var(--border); border-radius:14px; overflow-x:auto; max-width:100%;">
-          <div style="display:grid; grid-template-columns:100px 140px 200px 90px 110px 140px 90px; min-width:870px; padding:10px 16px; background:var(--bg); font-size:11px; font-weight:700; color:var(--text-soft);">
-            <div>Código</div><div>Cliente</div><div>Items</div><div>Total</div><div>Estado</div><div>Repartidor</div><div>Acción</div>
-          </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
           <sc-for list="{{pedidosRecientes}}" as="p" hint-placeholder-count="4">
-            <div style="display:grid; grid-template-columns:100px 140px 200px 90px 110px 140px 90px; min-width:870px; padding:12px 16px; border-top:1px solid var(--border); font-size:13px; align-items:center;">
-              <div style="color:var(--text-soft); font-family:ui-monospace,monospace; font-size:12px;">{{p.id}}</div>
-              <div style="font-weight:600;">{{p.cliente}}</div>
-              <div style="color:var(--text-soft);">{{p.items}}</div>
-              <div style="font-weight:700;">{{p.totalLabel}}</div>
-              <div><span style="{{p.badgeStyle}}">{{p.estado}}</span></div>
-              <div style="color:var(--text-soft);">{{p.repartidor}}</div>
-              <div>
+            <div style="border:1px solid var(--border); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="font-weight:700; font-size:13px;">{{p.cliente}}</div>
+                <span style="{{p.badgeStyle}}">{{p.estado}}</span>
+              </div>
+              <div style="font-size:12px; color:var(--text-soft); font-family:ui-monospace,monospace;">{{p.id}}</div>
+              <div style="font-size:12px; color:var(--text-soft);">{{p.items}}</div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                <div style="font-size:12px; color:var(--text-soft);">Repartidor: {{p.repartidor}}</div>
+                <div style="font-weight:700; font-size:14px;">{{p.totalLabel}}</div>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:flex-end; gap:14px; margin-top:4px;">
                 <sc-if value="{{p.canCancel}}" hint-placeholder-val="{{true}}">
                   <span style="color:var(--danger); font-weight:700; font-size:12px; cursor:pointer;" onClick="{{p.cancelHandler}}">Anular</span>
                 </sc-if>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="cursor:pointer; flex:none;" onClick="{{p.deleteHandler}}"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-8 0v13a1 1 0 001 1h8a1 1 0 001-1V7" stroke="var(--text-soft)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
             </div>
           </sc-for>
@@ -484,40 +487,41 @@
 
         <sc-if value="{{hasBajas}}" hint-placeholder-val="{{false}}">
           <div style="font-size:14px; font-weight:700; margin-bottom:10px;">Bidones dados de baja</div>
-          <div style="border:1px solid var(--border); border-radius:14px; overflow-x:auto; max-width:100%; margin-bottom:24px;">
-            <div style="display:grid; grid-template-columns:100px 120px 90px 1fr; min-width:520px; padding:10px 16px; background:var(--bg); font-size:11px; font-weight:700; color:var(--text-soft);">
-              <div>Fecha</div><div>Motivo</div><div>Cantidad</div><div>Observaciones</div>
-            </div>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:24px;">
             <sc-for list="{{bajas}}" as="b" hint-placeholder-count="2">
-              <div style="display:grid; grid-template-columns:100px 120px 90px 1fr; min-width:520px; padding:12px 16px; border-top:1px solid var(--border); font-size:13px; align-items:center;">
-                <div style="color:var(--text-soft);">{{b.fecha}}</div>
-                <div style="font-weight:600;">{{b.motivo}}</div>
-                <div style="font-weight:700; color:var(--danger);">{{b.cantidad}}</div>
-                <div style="color:var(--text-soft);">{{b.observaciones}}</div>
+              <div style="border:1px solid var(--border); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:4px;">
+                <div style="display:flex; justify-content:space-between;">
+                  <div style="font-weight:700; font-size:13px;">{{b.motivo}}</div>
+                  <div style="font-weight:700; font-size:13px; color:var(--danger);">{{b.cantidad}} unidad(es)</div>
+                </div>
+                <div style="font-size:12px; color:var(--text-soft);">{{b.fecha}}</div>
+                <div style="font-size:12px; color:var(--text-soft);">{{b.observaciones}}</div>
               </div>
             </sc-for>
           </div>
         </sc-if>
-        <div style="border:1px solid var(--border); border-radius:14px; overflow-x:auto; max-width:100%;">
-          <div style="display:grid; grid-template-columns:2fr 150px 90px; min-width:460px; padding:10px 16px; background:var(--bg); font-size:11px; font-weight:700; color:var(--text-soft);">
-            <div>Producto</div><div>Precio (USD)</div><div>Stock</div>
-          </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
           <sc-for list="{{inventoryProducts}}" as="p" hint-placeholder-count="4">
-            <div style="display:grid; grid-template-columns:2fr 150px 90px; min-width:460px; padding:12px 16px; border-top:1px solid var(--border); align-items:center; {{p.rowStyle}}">
+            <div style="border:1px solid var(--border); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:10px; {{p.rowStyle}}">
               <div>
                 <div style="font-weight:700; font-size:13px;">{{p.name}}</div>
                 <div style="font-size:11px; color:var(--text-soft);">{{p.unit}}</div>
               </div>
-              <div style="display:flex; align-items:center; gap:4px;">
-                <span style="color:var(--text-soft); font-size:13px;">$</span>
-                <input type="number" step="0.01" min="0" value="{{p.price}}" onChange="{{p.priceChange}}" style="width:90px; padding:6px 8px; border:1px solid var(--border); border-radius:8px; font-family:'Sora',system-ui,sans-serif; font-size:13px;"/>
+              <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:120px;">
+                  <div style="font-size:10px; font-weight:700; color:var(--text-soft);">PRECIO (USD)</div>
+                  <div style="display:flex; align-items:center; gap:4px;">
+                    <span style="color:var(--text-soft); font-size:13px;">$</span>
+                    <input type="number" step="0.01" min="0" value="{{p.price}}" onChange="{{p.priceChange}}" style="width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:8px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box;"/>
+                  </div>
+                </div>
+                <sc-if value="{{p.hasStock}}" hint-placeholder-val="{{true}}">
+                  <div style="display:flex; flex-direction:column; gap:4px; flex:1; min-width:100px;">
+                    <div style="font-size:10px; font-weight:700; color:var(--text-soft);">STOCK</div>
+                    <input type="number" value="{{p.stock}}" onChange="{{p.stockChange}}" style="width:100%; padding:6px 8px; border:1px solid var(--border); border-radius:8px; font-family:'Sora',system-ui,sans-serif; font-size:13px; box-sizing:border-box;"/>
+                  </div>
+                </sc-if>
               </div>
-              <sc-if value="{{p.hasStock}}" hint-placeholder-val="{{true}}">
-                <input type="number" value="{{p.stock}}" onChange="{{p.stockChange}}" style="width:80px; padding:6px 8px; border:1px solid var(--border); border-radius:8px; font-family:'Sora',system-ui,sans-serif; font-size:13px;"/>
-              </sc-if>
-              <sc-if value="{{p.noStock}}" hint-placeholder-val="{{false}}">
-                <div style="font-size:12px; color:var(--text-soft);">—</div>
-              </sc-if>
             </div>
           </sc-for>
         </div>
@@ -554,15 +558,12 @@
         </sc-if>
 
         <sc-if value="{{hasClientes}}" hint-placeholder-val="{{false}}">
-          <div style="border:1px solid var(--border); border-radius:14px; overflow-x:auto; max-width:100%;">
-            <div style="display:grid; grid-template-columns:140px 200px 110px; min-width:450px; padding:10px 16px; background:var(--bg); font-size:11px; font-weight:700; color:var(--text-soft);">
-              <div>Nombre</div><div>Dirección</div><div>Teléfono</div>
-            </div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
             <sc-for list="{{clientes}}" as="c" hint-placeholder-count="3">
-              <div style="display:grid; grid-template-columns:140px 200px 110px; min-width:450px; padding:12px 16px; border-top:1px solid var(--border); font-size:13px; align-items:center;">
-                <div style="font-weight:600;">{{c.nombre}}</div>
-                <div style="color:var(--text-soft);">{{c.direccion}}</div>
-                <div style="color:var(--text-soft);">{{c.telefono}}</div>
+              <div style="border:1px solid var(--border); border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:4px;">
+                <div style="font-weight:700; font-size:13px;">{{c.nombre}}</div>
+                <div style="font-size:12px; color:var(--text-soft);">{{c.direccion}}</div>
+                <div style="font-size:12px; color:var(--text-soft);">{{c.telefono}}</div>
               </div>
             </sc-for>
           </div>
@@ -951,6 +952,13 @@ class Component extends DCLogic {
     }));
   }
 
+  deletePedido(id) {
+    if (!window.confirm('¿Eliminar este pedido definitivamente?')) return;
+    this.setState(prev => ({
+      pedidosRecientes: prev.pedidosRecientes.filter(p => p.id !== id),
+      entregas: prev.entregas.filter(e => e.id !== id)
+    }));
+  }
   cancelPedido(id) {
     this.setState(prev => ({
       pedidosRecientes: prev.pedidosRecientes.map(p => p.id === id ? { ...p, estado: 'Anulado' } : p),
@@ -1007,7 +1015,7 @@ class Component extends DCLogic {
         const todayIso = new Date().toISOString().slice(0, 10);
         if (endMin !== null && (!e.fecha || e.fecha <= todayIso) && nowMinutes > endMin) { bg = 'oklch(0.9 0.09 95)'; color = 'oklch(0.45 0.13 80)'; }
       }
-      return { ...e, estadoLabel, fechaLabel: fmtFechaLabel(e.fecha), badgeStyle: badge(bg, color), selectHandler: () => this.selectEntrega(e.id) };
+      return { ...e, estadoLabel, fechaLabel: fmtFechaLabel(e.fecha), badgeStyle: badge(bg, color), selectHandler: () => this.selectEntrega(e.id), deleteHandler: (ev) => { ev.stopPropagation(); this.deletePedido(e.id); } };
     });
     const horarioMinutes = (horario) => {
       const m = /(\d{1,2}):(\d{2})/.exec(horario || '');
@@ -1048,7 +1056,8 @@ class Component extends DCLogic {
       return {
         ...p, estado, totalLabel: this.fmt(p.total), badgeStyle: estadoBadge[estado],
         canCancel: estado !== 'Anulado' && estado !== 'Entregado' && estado !== 'No entregado',
-        cancelHandler: () => this.cancelPedido(p.id)
+        cancelHandler: () => this.cancelPedido(p.id),
+        deleteHandler: () => this.deletePedido(p.id)
       };
     }).sort((a, b) => {
       const fa = a.fecha || '9999-99-99', fb = b.fecha || '9999-99-99';
