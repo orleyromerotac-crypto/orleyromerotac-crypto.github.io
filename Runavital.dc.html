@@ -828,7 +828,7 @@ class Component extends DCLogic {
     const s = this.state;
     const toSave = {
       products: s.products, entregas: s.entregas, pedidosRecientes: s.pedidosRecientes,
-      bajas: s.bajas, adminOrderCounter: s.adminOrderCounter, repartidores: s.repartidores, clientes: s.clientes,
+      bajas: s.bajas, adminOrderCounter: s.adminOrderCounter, clientes: s.clientes,
       updatedAt: Date.now()
     };
     this.db.collection('runavital').doc('shared').set(toSave, { merge: true }).catch(e => console.error('Runavital: failed to save data', e));
@@ -1053,8 +1053,9 @@ class Component extends DCLogic {
   setNewRepartidorNombre(value) { this.setState({ newRepartidorNombre: value }); }
   deleteRepartidor(name) {
     if (!window.confirm('¿Eliminar a ' + name + ' y revocar su acceso a la app?')) return;
-    this.setState(prev => ({ repartidores: prev.repartidores.filter(n => n !== name) }));
     if (this.db) {
+      this.db.collection('runavital').doc('shared').set({ repartidores: firebase.firestore.FieldValue.arrayRemove(name) }, { merge: true })
+        .catch(err => console.error('Runavital: error quitando repartidor', err));
       this.db.collection('users').where('name', '==', name).where('role', '==', 'repartidor').get()
         .then(snap => Promise.all(snap.docs.map(doc => doc.ref.delete())))
         .catch(err => console.error('Runavital: error revocando acceso del repartidor', err));
