@@ -694,9 +694,8 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1400,&quot;height&quot;:900},&quot;brandName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Runavital&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Marca&quot;},&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#2f9e93&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Marca&quot;}}">
 class Component extends DCLogic {
-  state = this.loadPersisted() || this.defaultState();
-
   STORAGE_KEY = 'runavital_data_v3';
+  state = this.loadPersisted() || this.defaultState();
 
   defaultState() {
     return {
@@ -735,12 +734,13 @@ class Component extends DCLogic {
       const raw = localStorage.getItem(this.STORAGE_KEY);
       if (!raw) return null;
       const saved = JSON.parse(raw);
+      if (!saved || typeof saved !== 'object') return null;
       const defaults = this.defaultState();
-      const validIds = new Set(defaults.products.map(p => p.id));
-      const savedHasValidProducts = Array.isArray(saved.products) && saved.products.some(p => validIds.has(p.id));
-      if (!savedHasValidProducts) return null;
       return this.pruneOldData({ ...defaults, ...saved, showSplash: true });
-    } catch (e) { return null; }
+    } catch (e) {
+      console.error('Runavital: failed to load saved data', e);
+      return null;
+    }
   }
 
   pruneOldData(state) {
@@ -762,7 +762,7 @@ class Component extends DCLogic {
       bajas: s.bajas, adminOrderCounter: s.adminOrderCounter, repartidores: s.repartidores,
       currentRepartidor: s.currentRepartidor, clientes: s.clientes
     };
-    try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(toSave)); } catch (e) {}
+    try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(toSave)); } catch (e) { console.error('Runavital: failed to save data', e); }
   }
 
   componentDidMount() {
